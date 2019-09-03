@@ -3,19 +3,19 @@ output_dir: "docs"
 navbar:  
   title: "Home"
   left:
-    - text: "1 Rasters"
+    - text: "1A Rasters"
       href: 01rasterstructure.html
-    - text: "2 Plot Rasters"
+    - text: "2A Plot Rasters"
       href: 02rasterplot.html
-    - text: "3 Reproject Rasters"
+    - text: "3S Reproject Rasters"
       href: 03rasterreproject.html
-    - text: "4 Raster math"
+    - text: "4S Raster math"
       href: 04rastercalculations.html
-    - text: "6 Vector"
+    - text: "6D Vector"
       href: 06vectoropenshapefile.html
-    - text: "7 Shapefile attributes"
+    - text: "7D Shapefile attributes"
       href: 07vectorshapefileattributes.html
-    - text: "8? Vectors CRS"
+    - text: "8D? Vectors CRS"
       href: 08vectorcrs.html
 output:
   html_document:
