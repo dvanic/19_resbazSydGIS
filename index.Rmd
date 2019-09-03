@@ -1,11 +1,105 @@
----
-title: "Homepage"
----
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Readme
+## Instructor notes
 
-This is the homepage of the SIH 2019 ResBaz R for GIS run by Darya...
+### Workshop start
+
+1. Names of instructors (write on board)
+2. Introduce instructors and helper:
+    - Darya: bioinformatics, analyst etc
+    - Alireza
+    - Steefan
+    - Alex
+4. Exits/toilets/first aid/timing of breaks
+5. Operations: sign in, name tags, stickies. Code of conduct
+5. Operations: slides + code + exercises
+6. How to use stickies
+6. Online notes and data: links  
+  - https://docs.google.com/document/d/1SzqDQrE4oWT9uDp6sKAQyRrkSQ4dJr-t7v0WTOuX-lY/edit?usp=sharing aka https://tinyurl.com/sydneyresbaz19
+7. Acnowledge interests, address 
+8. Importance of surveys
+
+
+***
+### Links to our pages
+
+### Links to original DC content
+
+#### Session 1 - Darya
+
+This will be a presentation. Make a link to it later
+
+#### Session 2 - Alireza
+
+
+[01rasterstructure](01rasterstructure.html)
+
+[02rasterplot](02rasterplot.html)
+
+[03rasterreproject](03rasterreproject.html)
+
+[04rastercalculations](04rastercalculations.html)
+
+[06vectoropenshapefile](06vectoropenshapefile.html)
+
+[07vectorshapefileattributes](07vectorshapefileattributes.html)
+
+[08vectorcrs](08vectorcrs.html)
+
+
+https://datacarpentry.org/r-raster-vector-geospatial/01-raster-structure/index.html
+
+https://datacarpentry.org/r-raster-vector-geospatial/02-raster-plot/index.html
+
+#### Session 3 - Steefan
+
+https://datacarpentry.org/r-raster-vector-geospatial/03-raster-reproject-in-r/index.html
+
+https://datacarpentry.org/r-raster-vector-geospatial/04-raster-calculations-in-r/index.html
+
+
+#### Session 4  - Darya
+
+https://datacarpentry.org/r-raster-vector-geospatial/06-vector-open-shapefile-in-r/index.html
+
+https://datacarpentry.org/r-raster-vector-geospatial/07-vector-shapefile-attributes-in-r/index.html
+
+Ideally cover this as well:
+
+https://datacarpentry.org/r-raster-vector-geospatial/09-vector-when-data-dont-line-up-crs/index.html
+
+
+***
+
+### Links to original DC content
+
+#### Session 1 - Darya
+
+https://datacarpentry.org/organization-geospatial/
+
+
+#### Session 2 - Alireza
+
+https://datacarpentry.org/r-raster-vector-geospatial/01-raster-structure/index.html
+
+https://datacarpentry.org/r-raster-vector-geospatial/02-raster-plot/index.html
+
+#### Session 3 - Steefan
+
+https://datacarpentry.org/r-raster-vector-geospatial/03-raster-reproject-in-r/index.html
+
+https://datacarpentry.org/r-raster-vector-geospatial/04-raster-calculations-in-r/index.html
+
+
+#### Session 4  - Darya
+
+https://datacarpentry.org/r-raster-vector-geospatial/06-vector-open-shapefile-in-r/index.html
+
+https://datacarpentry.org/r-raster-vector-geospatial/07-vector-shapefile-attributes-in-r/index.html
+
+Ideally cover this as well:
+
+https://datacarpentry.org/r-raster-vector-geospatial/09-vector-when-data-dont-line-up-crs/index.html

@@ -2,6 +2,21 @@ name: "ResBaz Sydney 2019 GIS in R workshop notes"
 output_dir: "docs"
 navbar:  
   title: "Home"
+  left:
+    - text: "1 Rasters"
+      href: 01rasterstructure.html
+    - text: "2 Plot Rasters"
+      href: 02rasterplot.html
+    - text: "3 Reproject Rasters"
+      href: 03rasterreproject.html
+    - text: "4 Raster math"
+      href: 04rastercalculations.html
+    - text: "6 Vector"
+      href: 06vectoropenshapefile.html
+    - text: "7 Shapefile attributes"
+      href: 07vectorshapefileattributes.html
+    - text: "8? Vectors CRS"
+      href: 08vectorcrs.html
 output:
   html_document:
     theme: cosmo

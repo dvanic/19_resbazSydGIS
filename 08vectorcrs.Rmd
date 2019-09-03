@@ -1,0 +1,3 @@
+### Raster structure
+
+Notes on raster structure
