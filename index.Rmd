@@ -1,0 +1,11 @@
+---
+title: "Homepage"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Readme
+
+This is the homepage of the SIH 2019 ResBaz R for GIS run by Darya...

@@ -1,0 +1,7 @@
+name: "ResBaz Sydney 2019 GIS in R workshop notes"
+output_dir: "docs"
+navbar:  
+  title: "Home"
+output:
+  html_document:
+    theme: cosmo
