@@ -1,3 +1,23 @@
-### Raster structure
+### Open and Plot Shapefiles in R
 
-Notes on raster structure
+1. Questions:
+  - How can I distinguish between and visualize point, line and polygon vector data?
+
+2. Objectives
+
+  - Know the difference between point, line, and polygon vector elements.
+  - Load point, line, and polygon shapefiles into R.
+  - Access the attributes of a spatial object in R.
+
+The data we'll be using come from the NEON Harvard Forest field site, which we have been working with in previous episodes.
+
+## Import shapefiles
+
+- We will use the `sf` package to work with vector data in R. This stands for "Spatial features".
+
+- `rgdal` automatically loads when `sf` is loaded. I'll mention here that there is another package called `sp`, which was the "old" one used to work with vector files in R. We will use `sf` in this course, as it is newer and more robust (as in, doesn't change the data type when doing things linke merges and joins) - but you sometimes will need to use `sp` with other R packages, most notably raster, - and you'll see it on stackoverflow. 
+
+
+
+
+
