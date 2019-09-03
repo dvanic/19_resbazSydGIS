@@ -26,7 +26,9 @@ knitr::opts_chunk$set(echo = TRUE)
 ***
 ### Links to our pages
 
-### Links to original DC content
+CHALLENGES FILE: LALALA
+
+- reminder: link to challenges file in first page of student notes!!!
 
 #### Session 1 - Darya
 
@@ -39,37 +41,25 @@ This will be a presentation. Make a link to it later
 
 [02rasterplot](02rasterplot.html)
 
+
+#### Session 3 - Steefan
+
+
 [03rasterreproject](03rasterreproject.html)
 
 [04rastercalculations](04rastercalculations.html)
+
+#### Session 4  - Darya
 
 [06vectoropenshapefile](06vectoropenshapefile.html)
 
 [07vectorshapefileattributes](07vectorshapefileattributes.html)
 
-[08vectorcrs](08vectorcrs.html)
-
-
-https://datacarpentry.org/r-raster-vector-geospatial/01-raster-structure/index.html
-
-https://datacarpentry.org/r-raster-vector-geospatial/02-raster-plot/index.html
-
-#### Session 3 - Steefan
-
-https://datacarpentry.org/r-raster-vector-geospatial/03-raster-reproject-in-r/index.html
-
-https://datacarpentry.org/r-raster-vector-geospatial/04-raster-calculations-in-r/index.html
-
-
-#### Session 4  - Darya
-
-https://datacarpentry.org/r-raster-vector-geospatial/06-vector-open-shapefile-in-r/index.html
-
-https://datacarpentry.org/r-raster-vector-geospatial/07-vector-shapefile-attributes-in-r/index.html
 
 Ideally cover this as well:
 
-https://datacarpentry.org/r-raster-vector-geospatial/09-vector-when-data-dont-line-up-crs/index.html
+[08vectorcrs](08vectorcrs.html)
+
 
 
 ***
