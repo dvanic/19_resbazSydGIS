@@ -40,13 +40,11 @@ Let's look at the metadata of our shapefile...
 
 - There are commands to view this information from the R object as well
 
-```{r}
+```{r lookatmetadata}
 st_geometry_type(aoi_boundary_HARV)
 # you can see all possible geometry types using
 levels(st_geometry_type(aoi_boundary_HARV))
 # note some are more useful than others
-# 
 st_crs(aoi_boundary_HARV)
-
 ```
 
