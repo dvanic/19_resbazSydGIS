@@ -1,3 +1,169 @@
-### Raster structure
+### Reproject Raster
 
-Notes on raster structure
+## Initial Setup and exploration
+**Task:** Import two geoTiffs, investigate ggplot behaviour when plotting them on top of each other. Explain behaviour by comparing projections of the two geoTiffs.
+
+Load the raster library
+```{r}
+library(raster)
+```
+
+Import dtmCrop and dtmHill_WGS84 geoTiffs
+```{r}
+DTM_HARV <- raster("data/NEON-DS-Airborne-Remote-Sensing/HARV/DTM/HARV_dtmCrop.tif")
+DTM_hill_HARV <- raster("data/NEON-DS-Airborne-Remote-Sensing/HARV/DTM/HARV_DTMhill_WGS84.tif")
+
+DTM_HARV
+DTM_hill_HARV
+```
+
+Convert rasters into data frames
+```{r}
+DTM_HARV_df <- as.data.frame(DTM_HARV, xy = TRUE)
+DTM_hill_HARV_df <- as.data.frame(DTM_hill_HARV, xy = T)
+
+str(DTM_HARV_df)
+str(DTM_hill_HARV_df)
+```
+
+Plot both dfs on the same ggplot plot
+
+First import ggplot library
+```{r}
+library(ggplot2)
+```
+
+Plot DTM first
+```{r}
+ggplot() +
+  geom_raster(data = DTM_HARV_df, aes(x = x, y = y, fill = HARV_dtmCrop)) +
+  scale_fill_gradientn(name = "Elevation", colours = terrain.colors(10)) +
+  coord_quickmap()
+```
+
+Now plot hillshade
+```{r}
+ggplot() + 
+  geom_raster(data = DTM_hill_HARV_df, aes(x = x, y = y, alpha = HARV_DTMhill_WGS84)) +
+  coord_quickmap()
+```
+
+Now lets plot them on top of each other. What will happen?
+```{r}
+ggplot() +
+  geom_raster(data = DTM_hill_HARV_df, aes(x = x, y = y, alpha = HARV_DTMhill_WGS84)) +
+  geom_raster(data = DTM_HARV_df, aes(x = x, y = y, fill = HARV_dtmCrop)) +
+  scale_fill_gradientn(name = "Elevation", colours = terrain.colors(10)) +
+  coord_quickmap() 
+  
+```
+
+### Exercise
+View the CRS for each of these datasets. What projection does each use?
+```{r}
+crs(DTM_HARV)
+crs(DTM_hill_HARV)
+```
+DTM_HARV uses UTM projection in units of m, and DTM_hill_HARV used Geographic WGS84 represented by longitude and latitude values
+
+
+## Reproject Rasters
+
+Use the projectRaster() function to project one raster into the same crs as another raster. The CRS of the second raster must be defined. This would of course change the data values as well. 
+
+If the CRS of the second raster is not defined and you know the correct crs, then you can set the crs as follows
+```{r, eval=FALSE}
+crs(DTM_HARV) <- "+proj=utm +zone=18 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0"
+```
+However, this is risky.
+
+Reproject DTM_hill_HARV to match DTM_HARV crs
+```{r}
+DTM_hill_UTMZ18_HARV <- projectRaster(DTM_hill_HARV, crs = crs(DTM_HARV))
+
+crs(DTM_hill_UTMZ18_HARV)
+crs(DTM_hill_HARV)
+```
+
+Also compare the extents
+```{r}
+extent(DTM_hill_UTMZ18_HARV)
+extent(DTM_hill_HARV)
+```
+
+### Exercise
+Why do you think the two extents differ?
+
+Because the extent for DTM_hill_UTMZ18_HARV is in UTM coordinates in m while the extent for DTM_hill_HARV is in long/lat in decimal degrees.
+
+## Deal with Raster Resolution
+Use the res() function to print resolutions of the original and reprojected hillshade rasters
+```{r}
+res(DTM_hill_HARV)
+res(DTM_hill_UTMZ18_HARV)
+```
+
+The resolution of reprojected raster can be forced with the res argument
+```{r}
+DTM_hill_UTMZ18_HARV <- projectRaster(DTM_hill_HARV, 
+                                      crs = crs(DTM_HARV),
+                                      res = 1)
+```
+
+Double check res
+```{r}
+res(DTM_hill_HARV)
+res(DTM_hill_UTMZ18_HARV)
+```
+
+**Redo plot of both rasters on the same plot**
+
+First create df
+```{r}
+DTM_hill_UTMZ18_HARV_df <- as.data.frame(DTM_hill_UTMZ18_HARV, xy = TRUE)
+```
+
+Now the plot
+```{r}
+ggplot() +
+  geom_raster(data = DTM_hill_UTMZ18_HARV_df, aes(x = x, y = y, alpha = HARV_DTMhill_WGS84)) +
+  geom_raster(data = DTM_HARV_df, aes(x = x, y = y, fill = HARV_dtmCrop)) +
+  scale_fill_gradientn(name = "Elevation", colours = terrain.colors(10)) +
+  scale_alpha(range = c(0.25, 0.65), guide = "none") +
+  coord_quickmap() 
+```
+
+### Exercise 3
+Create a map of the San Joaquin Experimental Range field site using the SJER_DSMhill_WGS84.tif and SJER_dsmCrop.tif files. Reproject the data as necessary to make things line up!
+```{r}
+# import
+DSM_SJER <- raster("data/NEON-DS-Airborne-Remote-Sensing/SJER/DSM/SJER_dsmCrop.tif")
+DSM_hill_SJER <- raster("data/NEON-DS-Airborne-Remote-Sensing/SJER/DSM/SJER_DSMhill_WGS84.tif")
+
+#check crs
+crs(DSM_SJER)
+crs(DSM_hill_SJER)
+
+# reproject
+DSM_hill_UTMZ18_SJER <- projectRaster(DSM_hill_SJER, crs = crs(DSM_SJER), res = res(DSM_SJER))
+
+# convert to df
+DSM_SJER_df <- as.data.frame(DSM_SJER, xy = TRUE)
+DSM_hill_UTMZ18_SJER_df <- as.data.frame(DSM_hill_UTMZ18_SJER, xy = TRUE)
+
+# get structure of dfs
+str(DSM_SJER_df)
+str(DSM_hill_UTMZ18_SJER_df)
+
+# plot
+ggplot() +
+  geom_raster(data = DSM_hill_UTMZ18_SJER_df, aes(x = x, y = y, alpha = SJER_DSMhill_WGS84)) +
+  geom_raster(data = DSM_SJER_df, aes(x = x, y = y, fill = SJER_dsmCrop, alpha = 0.8)) +
+  scale_fill_gradientn(name = "Elevation", colours = terrain.colors(10)) +
+  # scale_alpha(range = c(0.25, 0.65), guide = "none") +
+  coord_quickmap() 
+```
+
+If you completed the San Joaquin plotting challenge in the Plot Raster Data in R episode, how does the map you just created compare to that map?
+
+*The map looks identical which is expected*
