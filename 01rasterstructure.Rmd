@@ -1,3 +1,126 @@
 ### Raster structure
 
+Questions:
+What is a raster dataset?
+How do I work with and plot raster data in R?
+How can I handle missing or bad data values for a raster?
+
+Objectives:
+Describe the fundamental attributes of a raster dataset.
+Explore raster attributes and metadata using R.
+Import rasters into R using the raster package.
+Plot a raster file in R using the ggplot2 package.
+Describe the difference between single- and multi-band rasters.
+
+
+installing the raster and rgdal packages: install.packages("raster"). Note that for raster package you might need to install sp package using install.packages("sp")
+as wel ass install.packages("rgdal")
+```{r}
+library(sp)
+library(raster)
+library(rgdal)
+```
+
+First download the data using the link below:
+https://ndownloader.figshare.com/articles/2009586/versions/10
+
+viewing the Raster file attributes
+```{r}
+GDALinfo("data/NEON-DS-Airborne-Remote-Sensing/HARV/DSM/HARV_dsmCrop.tif")
+```
+
+Storing this information in R
+```{r}
+HARV_dsmCrop_info <- capture.output(
+  GDALinfo("data/NEON-DS-Airborne-Remote-Sensing/HARV/DSM/HARV_dsmCrop.tif")
+)
+```
+
+Open a Raster in R
+```{r}
+DSM_HARV <- 
+  raster("data/NEON-DS-Airborne-Remote-Sensing/HARV/DSM/HARV_dsmCrop.tif")
+
+DSM_HARV
+```
+
+```{r}
+summary(DSM_HARV)
+```
+
+```{r}
+summary(DSM_HARV, maxsamp = ncell(DSM_HARV))
+```
+
+convert it to a dataframe in order to plot it using ggplot2
+```{r}
+DSM_HARV_df <- as.data.frame(DSM_HARV, xy = TRUE)
+```
+
+can see a standard dataframe format
+```{r}
+str(DSM_HARV_df)
+```
+
+Note: in case ggplot is not installed install.packages("ggplot2") or install.packages("ggplot2", dependencies = TRUE), then check the packages to make sure it is ticked
+```{r}
+ggplot() +
+  geom_raster(data = DSM_HARV_df , aes(x = x, y = y, fill = HARV_dsmCrop)) +   scale_fill_viridis_c() +
+  coord_quickmap()
+```
+
+View Raster Coordinate Reference System (CRS) in R:
+We can view the CRS string associated with our R object using thecrs() function.
+```{r}
+crs(DSM_HARV)
+```
+Challenge: What units are our data in?
+
+Understanding CRS in Proj4 Format:
+proj=utm: the projection is UTM, UTM has several zones.
+zone=18: the zone is 18
+datum=WGS84: the datum is WGS84 (the datum refers to the 0,0 reference for the coordinate system used in the projection)
+units=m: the units for the coordinates are in meters
+ellps=WGS84: the ellipsoid (how the earth’s roundness is calculated) for the data is WGS84
+
+Calculate Raster Min and Max Values
+```{r}
+minValue(DSM_HARV)
+```
+```{r}
+maxValue(DSM_HARV)
+```
+
+Set min and max values:
+```{r}
+DSM_HARV <- setMinMax(DSM_HARV)
+```
+
+We can use the raster() function to import one single band from a single or multi-band raster. We can view the number of bands in a raster using the nlayers() function.
+```{r}
+nlayers(DSM_HARV)
+```
+
+To highlight NA values in ggplot, alter the scale_fill_*() layer to contain a colour instruction for NA values, like scale_fill_viridis_c(na.value = 'deeppink')
+
+```{r}
+GDALinfo("data/NEON-DS-Airborne-Remote-Sensing/HARV/DSM/HARV_dsmCrop.tif")
+```
+
+Bad Data Values in Rasters are different from NoDataValue(s)
+
+Create A Histogram of Raster Values:
+```{r}
+ggplot() +
+    geom_histogram(data = DSM_HARV_df, aes(HARV_dsmCrop))
+```
+
+
+```{r}
+ggplot() +
+    geom_histogram(data = DSM_HARV_df, aes(HARV_dsmCrop), bins = 40)
+```
+
+
+
 Notes on raster structure
