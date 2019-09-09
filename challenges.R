@@ -1,7 +1,16 @@
 # This is the file for the challenges
 
+# 03 Reproject Rasters in R
 
-
+## Exercise 1
+## View the CRS for each of these datasets. What projection does each use?
+## Exercise 2
+## Why do you think the two extents differ?
+## Exercise 3
+## Create a map of the San Joaquin Experimental Range field site using the SJER_DSMhill_WGS84.tif and SJER_dsmCrop.tif files. 
+## Reproject the data as necessary to make things line up!
+## If you completed the San Joaquin plotting challenge in the Plot Raster Data in R episode, 
+## how does the map you just created compare to that map?
 
 
 # 07 vector shapefile attributes -------------

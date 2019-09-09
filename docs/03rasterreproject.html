@@ -69,7 +69,9 @@ h6 {
 </style>
 
 
+</head>
 
+<body>
 
 <style type = "text/css">
 .main-container {
@@ -94,9 +96,6 @@ img {
 button.code-folding-btn:focus {
   outline: none;
 }
-summary {
-  display: list-item;
-}
 </style>
 
 
@@ -111,6 +110,7 @@ body {
   padding-top: 56px;
   margin-top: -56px;
 }
+
 .section h2 {
   padding-top: 56px;
   margin-top: -56px;
@@ -130,43 +130,6 @@ body {
 .section h6 {
   padding-top: 56px;
   margin-top: -56px;
-}
-.dropdown-submenu {
-  position: relative;
-}
-.dropdown-submenu>.dropdown-menu {
-  top: 0;
-  left: 100%;
-  margin-top: -6px;
-  margin-left: -1px;
-  border-radius: 0 6px 6px 6px;
-}
-.dropdown-submenu:hover>.dropdown-menu {
-  display: block;
-}
-.dropdown-submenu>a:after {
-  display: block;
-  content: " ";
-  float: right;
-  width: 0;
-  height: 0;
-  border-color: transparent;
-  border-style: solid;
-  border-width: 5px 0 5px 5px;
-  border-left-color: #cccccc;
-  margin-top: 5px;
-  margin-right: -10px;
-}
-.dropdown-submenu:hover>a:after {
-  border-left-color: #ffffff;
-}
-.dropdown-submenu.pull-left {
-  float: none;
-}
-.dropdown-submenu.pull-left>.dropdown-menu {
-  left: -100%;
-  margin-left: 10px;
-  border-radius: 6px 0 6px 6px;
 }
 </style>
 
@@ -188,85 +151,19 @@ $(document).ready(function () {
 });
 </script>
 
+
+<div class="container-fluid main-container">
+
 <!-- tabsets -->
-
-<style type="text/css">
-.tabset-dropdown > .nav-tabs {
-  display: inline-table;
-  max-height: 500px;
-  min-height: 44px;
-  overflow-y: auto;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-
-.tabset-dropdown > .nav-tabs > li.active:before {
-  content: "";
-  font-family: 'Glyphicons Halflings';
-  display: inline-block;
-  padding: 10px;
-  border-right: 1px solid #ddd;
-}
-
-.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
-  content: "&#xe258;";
-  border: none;
-}
-
-.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
-  content: "";
-  font-family: 'Glyphicons Halflings';
-  display: inline-block;
-  padding: 10px;
-  border-right: 1px solid #ddd;
-}
-
-.tabset-dropdown > .nav-tabs > li.active {
-  display: block;
-}
-
-.tabset-dropdown > .nav-tabs > li > a,
-.tabset-dropdown > .nav-tabs > li > a:focus,
-.tabset-dropdown > .nav-tabs > li > a:hover {
-  border: none;
-  display: inline-block;
-  border-radius: 4px;
-}
-
-.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
-  display: block;
-  float: none;
-}
-
-.tabset-dropdown > .nav-tabs > li {
-  display: none;
-}
-</style>
-
 <script>
 $(document).ready(function () {
   window.buildTabsets("TOC");
-});
-
-$(document).ready(function () {
-  $('.tabset-dropdown > .nav-tabs > li').click(function () {
-    $(this).parent().toggleClass('nav-tabs-open')
-  });
 });
 </script>
 
 <!-- code folding -->
 
 
-
-
-</head>
-
-<body>
-
-
-<div class="container-fluid main-container">
 
 
 
@@ -284,7 +181,25 @@ $(document).ready(function () {
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="01rasterstructure.html">01rasterstructure</a>
+  <a href="01rasterstructure.html">1A Rasters</a>
+</li>
+<li>
+  <a href="02rasterplot.html">2A Plot Rasters</a>
+</li>
+<li>
+  <a href="03rasterreproject.html">3S Reproject Rasters</a>
+</li>
+<li>
+  <a href="04rastercalculations.html">4S Raster math</a>
+</li>
+<li>
+  <a href="06vectoropenshapefile.html">6D Vector</a>
+</li>
+<li>
+  <a href="07vectorshapefileattributes.html">7D Shapefile attributes</a>
+</li>
+<li>
+  <a href="08vectorcrs.html">8D? Vectors CRS</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -302,9 +217,191 @@ $(document).ready(function () {
 </div>
 
 
-<div id="raster-structure" class="section level3">
-<h3>Raster structure</h3>
-<p>Notes on raster structure</p>
+<div id="reproject-raster" class="section level3">
+<h3>Reproject Raster</h3>
+</div>
+<div id="initial-setup-and-exploration" class="section level2">
+<h2>Initial Setup and exploration</h2>
+<p><strong>Task:</strong> Import two geoTiffs, investigate ggplot behaviour when plotting them on top of each other. Explain behaviour by comparing projections of the two geoTiffs.</p>
+<p>Load the raster library</p>
+<pre class="r"><code>library(raster)</code></pre>
+<pre><code>## Loading required package: sp</code></pre>
+<p>Import dtmCrop and dtmHill_WGS84 geoTiffs</p>
+<pre class="r"><code>DTM_HARV &lt;- raster(&quot;data/NEON-DS-Airborne-Remote-Sensing/HARV/DTM/HARV_dtmCrop.tif&quot;)
+DTM_hill_HARV &lt;- raster(&quot;data/NEON-DS-Airborne-Remote-Sensing/HARV/DTM/HARV_DTMhill_WGS84.tif&quot;)
+
+DTM_HARV</code></pre>
+<pre><code>## class       : RasterLayer 
+## dimensions  : 1367, 1697, 2319799  (nrow, ncol, ncell)
+## resolution  : 1, 1  (x, y)
+## extent      : 731453, 733150, 4712471, 4713838  (xmin, xmax, ymin, ymax)
+## coord. ref. : +proj=utm +zone=18 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0 
+## data source : /home/z3289452/Documents/GIT_REPOS/19_resbazSydGIS/data/NEON-DS-Airborne-Remote-Sensing/HARV/DTM/HARV_dtmCrop.tif 
+## names       : HARV_dtmCrop 
+## values      : 304.56, 389.82  (min, max)</code></pre>
+<pre class="r"><code>DTM_hill_HARV</code></pre>
+<pre><code>## class       : RasterLayer 
+## dimensions  : 1438, 1747, 2512186  (nrow, ncol, ncell)
+## resolution  : 1.22e-05, 8.99e-06  (x, y)
+## extent      : -72.18192, -72.16061, 42.52941, 42.54234  (xmin, xmax, ymin, ymax)
+## coord. ref. : +proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0 
+## data source : /home/z3289452/Documents/GIT_REPOS/19_resbazSydGIS/data/NEON-DS-Airborne-Remote-Sensing/HARV/DTM/HARV_DTMhill_WGS84.tif 
+## names       : HARV_DTMhill_WGS84 
+## values      : -0.1239408, 0.9957315  (min, max)</code></pre>
+<p>Convert rasters into data frames</p>
+<pre class="r"><code>DTM_HARV_df &lt;- as.data.frame(DTM_HARV, xy = TRUE)
+DTM_hill_HARV_df &lt;- as.data.frame(DTM_hill_HARV, xy = T)
+
+str(DTM_HARV_df)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    2319799 obs. of  3 variables:
+##  $ x           : num  731454 731454 731456 731456 731458 ...
+##  $ y           : num  4713838 4713838 4713838 4713838 4713838 ...
+##  $ HARV_dtmCrop: num  389 390 389 389 389 ...</code></pre>
+<pre class="r"><code>str(DTM_hill_HARV_df)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    2512186 obs. of  3 variables:
+##  $ x                 : num  -72.2 -72.2 -72.2 -72.2 -72.2 ...
+##  $ y                 : num  42.5 42.5 42.5 42.5 42.5 ...
+##  $ HARV_DTMhill_WGS84: num  NA NA NA NA NA NA NA NA NA NA ...</code></pre>
+<p>Plot both dfs on the same ggplot plot</p>
+<p>First import ggplot library</p>
+<pre class="r"><code>library(ggplot2)</code></pre>
+<p>Plot DTM first</p>
+<pre class="r"><code>ggplot() +
+  geom_raster(data = DTM_HARV_df, aes(x = x, y = y, fill = HARV_dtmCrop)) +
+  scale_fill_gradientn(name = &quot;Elevation&quot;, colours = terrain.colors(10)) +
+  coord_quickmap()</code></pre>
+<p><img src="03rasterreproject_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>Now plot hillshade</p>
+<pre class="r"><code>ggplot() + 
+  geom_raster(data = DTM_hill_HARV_df, aes(x = x, y = y, alpha = HARV_DTMhill_WGS84)) +
+  coord_quickmap()</code></pre>
+<p><img src="03rasterreproject_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p>Now lets plot them on top of each other. What will happen?</p>
+<pre class="r"><code>ggplot() +
+  geom_raster(data = DTM_hill_HARV_df, aes(x = x, y = y, alpha = HARV_DTMhill_WGS84)) +
+  geom_raster(data = DTM_HARV_df, aes(x = x, y = y, fill = HARV_dtmCrop)) +
+  scale_fill_gradientn(name = &quot;Elevation&quot;, colours = terrain.colors(10)) +
+  coord_quickmap() </code></pre>
+<p><img src="03rasterreproject_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<div id="exercise" class="section level3">
+<h3>Exercise</h3>
+<p>View the CRS for each of these datasets. What projection does each use?</p>
+<pre class="r"><code>crs(DTM_HARV)</code></pre>
+<pre><code>## CRS arguments:
+##  +proj=utm +zone=18 +datum=WGS84 +units=m +no_defs +ellps=WGS84
+## +towgs84=0,0,0</code></pre>
+<pre class="r"><code>crs(DTM_hill_HARV)</code></pre>
+<pre><code>## CRS arguments:
+##  +proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0</code></pre>
+<p>DTM_HARV uses UTM projection in units of m, and DTM_hill_HARV used Geographic WGS84 represented by longitude and latitude values</p>
+</div>
+</div>
+<div id="reproject-rasters" class="section level2">
+<h2>Reproject Rasters</h2>
+<p>Use the projectRaster() function to project one raster into the same crs as another raster. The CRS of the second raster must be defined. This would of course change the data values as well.</p>
+<p>If the CRS of the second raster is not defined and you know the correct crs, then you can set the crs as follows</p>
+<pre class="r"><code>crs(DTM_HARV) &lt;- &quot;+proj=utm +zone=18 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0&quot;</code></pre>
+<p>However, this is risky.</p>
+<p>Reproject DTM_hill_HARV to match DTM_HARV crs</p>
+<pre class="r"><code>DTM_hill_UTMZ18_HARV &lt;- projectRaster(DTM_hill_HARV, crs = crs(DTM_HARV))
+
+crs(DTM_hill_UTMZ18_HARV)</code></pre>
+<pre><code>## CRS arguments:
+##  +proj=utm +zone=18 +datum=WGS84 +units=m +no_defs +ellps=WGS84
+## +towgs84=0,0,0</code></pre>
+<pre class="r"><code>crs(DTM_hill_HARV)</code></pre>
+<pre><code>## CRS arguments:
+##  +proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0</code></pre>
+<p>Also compare the extents</p>
+<pre class="r"><code>extent(DTM_hill_UTMZ18_HARV)</code></pre>
+<pre><code>## class       : Extent 
+## xmin        : 731397.3 
+## xmax        : 733205.3 
+## ymin        : 4712403 
+## ymax        : 4713907</code></pre>
+<pre class="r"><code>extent(DTM_hill_HARV)</code></pre>
+<pre><code>## class       : Extent 
+## xmin        : -72.18192 
+## xmax        : -72.16061 
+## ymin        : 42.52941 
+## ymax        : 42.54234</code></pre>
+<div id="exercise-1" class="section level3">
+<h3>Exercise</h3>
+<p>Why do you think the two extents differ?</p>
+<p>Because the extent for DTM_hill_UTMZ18_HARV is in UTM coordinates in m while the extent for DTM_hill_HARV is in long/lat in decimal degrees.</p>
+</div>
+</div>
+<div id="deal-with-raster-resolution" class="section level2">
+<h2>Deal with Raster Resolution</h2>
+<p>Use the res() function to print resolutions of the original and reprojected hillshade rasters</p>
+<pre class="r"><code>res(DTM_hill_HARV)</code></pre>
+<pre><code>## [1] 1.22e-05 8.99e-06</code></pre>
+<pre class="r"><code>res(DTM_hill_UTMZ18_HARV)</code></pre>
+<pre><code>## [1] 1.000 0.998</code></pre>
+<p>The resolution of reprojected raster can be forced with the res argument</p>
+<pre class="r"><code>DTM_hill_UTMZ18_HARV &lt;- projectRaster(DTM_hill_HARV, 
+                                      crs = crs(DTM_HARV),
+                                      res = 1)</code></pre>
+<p>Double check res</p>
+<pre class="r"><code>res(DTM_hill_HARV)</code></pre>
+<pre><code>## [1] 1.22e-05 8.99e-06</code></pre>
+<pre class="r"><code>res(DTM_hill_UTMZ18_HARV)</code></pre>
+<pre><code>## [1] 1 1</code></pre>
+<p><strong>Redo plot of both rasters on the same plot</strong></p>
+<p>First create df</p>
+<pre class="r"><code>DTM_hill_UTMZ18_HARV_df &lt;- as.data.frame(DTM_hill_UTMZ18_HARV, xy = TRUE)</code></pre>
+<p>Now the plot</p>
+<pre class="r"><code>ggplot() +
+  geom_raster(data = DTM_hill_UTMZ18_HARV_df, aes(x = x, y = y, alpha = HARV_DTMhill_WGS84)) +
+  geom_raster(data = DTM_HARV_df, aes(x = x, y = y, fill = HARV_dtmCrop)) +
+  scale_fill_gradientn(name = &quot;Elevation&quot;, colours = terrain.colors(10)) +
+  scale_alpha(range = c(0.25, 0.65), guide = &quot;none&quot;) +
+  coord_quickmap() </code></pre>
+<p><img src="03rasterreproject_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<div id="exercise-3" class="section level3">
+<h3>Exercise 3</h3>
+<p>Create a map of the San Joaquin Experimental Range field site using the SJER_DSMhill_WGS84.tif and SJER_dsmCrop.tif files. Reproject the data as necessary to make things line up!</p>
+<pre class="r"><code># import
+DSM_SJER &lt;- raster(&quot;data/NEON-DS-Airborne-Remote-Sensing/SJER/DSM/SJER_dsmCrop.tif&quot;)
+DSM_hill_SJER &lt;- raster(&quot;data/NEON-DS-Airborne-Remote-Sensing/SJER/DSM/SJER_DSMhill_WGS84.tif&quot;)
+
+#check crs
+crs(DSM_SJER)</code></pre>
+<pre><code>## CRS arguments:
+##  +proj=utm +zone=11 +datum=WGS84 +units=m +no_defs +ellps=WGS84
+## +towgs84=0,0,0</code></pre>
+<pre class="r"><code>crs(DSM_hill_SJER)</code></pre>
+<pre><code>## CRS arguments:
+##  +proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0</code></pre>
+<pre class="r"><code># reproject
+DSM_hill_UTMZ18_SJER &lt;- projectRaster(DSM_hill_SJER, crs = crs(DSM_SJER), res = res(DSM_SJER))
+
+# convert to df
+DSM_SJER_df &lt;- as.data.frame(DSM_SJER, xy = TRUE)
+DSM_hill_UTMZ18_SJER_df &lt;- as.data.frame(DSM_hill_UTMZ18_SJER, xy = TRUE)
+
+# get structure of dfs
+str(DSM_SJER_df)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    4366890 obs. of  3 variables:
+##  $ x           : num  255694 255694 255696 255696 255698 ...
+##  $ y           : num  4111688 4111688 4111688 4111688 4111688 ...
+##  $ SJER_dsmCrop: num  458 458 457 458 458 ...</code></pre>
+<pre class="r"><code>str(DSM_hill_UTMZ18_SJER_df)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    4932864 obs. of  3 variables:
+##  $ x                 : num  255625 255626 255627 255628 255629 ...
+##  $ y                 : num  4111751 4111751 4111751 4111751 4111751 ...
+##  $ SJER_DSMhill_WGS84: num  NA NA NA NA NA NA NA NA NA NA ...</code></pre>
+<pre class="r"><code># plot
+ggplot() +
+  geom_raster(data = DSM_hill_UTMZ18_SJER_df, aes(x = x, y = y, alpha = SJER_DSMhill_WGS84)) +
+  geom_raster(data = DSM_SJER_df, aes(x = x, y = y, fill = SJER_dsmCrop, alpha = 0.8)) +
+  scale_fill_gradientn(name = &quot;Elevation&quot;, colours = terrain.colors(10)) +
+  # scale_alpha(range = c(0.25, 0.65), guide = &quot;none&quot;) +
+  coord_quickmap() </code></pre>
+<p><img src="03rasterreproject_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+<p>If you completed the San Joaquin plotting challenge in the Plot Raster Data in R episode, how does the map you just created compare to that map?</p>
+<p><em>The map looks identical which is expected</em></p>
+</div>
 </div>
 
 
