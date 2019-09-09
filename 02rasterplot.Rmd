@@ -11,8 +11,19 @@ Layer a raster dataset on top of a hillshade to create an elegant basemap.
 
 Plot Raster Data in R using ggplot
 
+```{r loadStuff, echo=F, warning=F, message=F}
+library(sp)
+library(raster)
+library(rgdal)
+library(tidyverse)
+DSM_HARV <- raster("data/NEON-DS-Airborne-Remote-Sensing/HARV/DSM/HARV_dsmCrop.tif")
+DSM_HARV_df <- as.data.frame(DSM_HARV, xy = TRUE)
+
+
+```
+
+
 ```{r}
-library(dplyr)
 
 DSM_HARV_df <- DSM_HARV_df %>% mutate(fct_elevation = cut(HARV_dsmCrop, breaks = 3))
 

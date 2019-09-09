@@ -284,7 +284,25 @@ $(document).ready(function () {
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="01rasterstructure.html">01rasterstructure</a>
+  <a href="01rasterstructure.html">1A Rasters</a>
+</li>
+<li>
+  <a href="02rasterplot.html">2A Plot Rasters</a>
+</li>
+<li>
+  <a href="03rasterreproject.html">3S Reproject Rasters</a>
+</li>
+<li>
+  <a href="04rastercalculations.html">4S Raster math</a>
+</li>
+<li>
+  <a href="06vectoropenshapefile.html">6D Vector</a>
+</li>
+<li>
+  <a href="07vectorshapefileattributes.html">7D Shapefile attributes</a>
+</li>
+<li>
+  <a href="08vectorcrs.html">8D? Vectors CRS</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -302,9 +320,148 @@ $(document).ready(function () {
 </div>
 
 
-<div id="raster-structure" class="section level3">
-<h3>Raster structure</h3>
-<p>Notes on raster structure</p>
+<div id="open-and-plot-shapefiles-in-r" class="section level3">
+<h3>Open and Plot Shapefiles in R</h3>
+<ol style="list-style-type: decimal">
+<li>Questions:</li>
+</ol>
+<ul>
+<li>How can I distinguish between and visualize point, line and polygon vector data?</li>
+</ul>
+<ol start="2" style="list-style-type: decimal">
+<li>Objectives</li>
+</ol>
+<ul>
+<li>Know the difference between point, line, and polygon vector elements.</li>
+<li>Load point, line, and polygon shapefiles into R.</li>
+<li>Access the attributes of a spatial object in R.</li>
+</ul>
+<p>The data we’ll be using come from the NEON Harvard Forest field site, which we have been working with in previous episodes.</p>
+<pre class="r"><code>library(sf)</code></pre>
+<pre><code>## Linking to GEOS 3.6.1, GDAL 2.1.3, PROJ 4.9.3</code></pre>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## Registered S3 methods overwritten by &#39;ggplot2&#39;:
+##   method         from 
+##   [.quosures     rlang
+##   c.quosures     rlang
+##   print.quosures rlang</code></pre>
+<pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.2.1 ──</code></pre>
+<pre><code>## ✔ ggplot2 3.1.1     ✔ purrr   0.3.2
+## ✔ tibble  2.1.3     ✔ dplyr   0.8.1
+## ✔ tidyr   0.8.3     ✔ stringr 1.4.0
+## ✔ readr   1.3.1     ✔ forcats 0.4.0</code></pre>
+<pre><code>## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>theme_set(theme_minimal())</code></pre>
+</div>
+<div id="import-shapefiles" class="section level2">
+<h2>Import shapefiles</h2>
+<ul>
+<li><p>We will use the <code>sf</code> package to work with vector data in R. This stands for “Spatial features”.</p></li>
+<li><p><code>rgdal</code> automatically loads when <code>sf</code> is loaded. I’ll mention here that there is another package called <code>sp</code>, which was the “old” one used to work with vector files in R. We will use <code>sf</code> in this course, as it is newer and more robust (as in, doesn’t change the data type when doing things linke merges and joins) - but you sometimes will need to use <code>sp</code> with other R packages, most notably raster, - and you’ll see it on stackoverflow.</p></li>
+</ul>
+<p>The shapefiles that we will import are: - A polygon shapefile representing our field site boundary, which we’ll call our Area Of Interest or AOI - A line shapefile representing roads - A point shapefile representing the location of the Fisher flux tower - which we will call “tower” from now on.</p>
+<pre class="r"><code># To import shapefiles we use the sf function st_read()
+aoi_boundary_HARV &lt;- st_read(&quot;data/NEON-DS-Site-Layout-Files/HARV/HarClip_UTMZ18.shp&quot;)</code></pre>
+<pre><code>## Reading layer `HarClip_UTMZ18&#39; from data source `/Users/darya/Dropbox (Sydney Uni)/Training/19_09_11_ResBaz/19_01_11_ResBazGIS/data/NEON-DS-Site-Layout-Files/HARV/HarClip_UTMZ18.shp&#39; using driver `ESRI Shapefile&#39;
+## Simple feature collection with 1 feature and 1 field
+## geometry type:  POLYGON
+## dimension:      XY
+## bbox:           xmin: 732128 ymin: 4713209 xmax: 732251.1 ymax: 4713359
+## epsg (SRID):    32618
+## proj4string:    +proj=utm +zone=18 +datum=WGS84 +units=m +no_defs</code></pre>
+<p>Let’s look at the metadata of our shapefile…</p>
+<p>…</p>
+<ul>
+<li><p>Note that the spatial extent for a shapefile represents the combined extent for all spatial objects in the shapefile.</p></li>
+<li><p>There are commands to view this information from the R object as well. They start with “st”, which I assume means “standard”?…</p></li>
+</ul>
+<pre class="r"><code>st_geometry_type(aoi_boundary_HARV)</code></pre>
+<pre><code>## [1] POLYGON
+## 18 Levels: GEOMETRY POINT LINESTRING POLYGON ... TRIANGLE</code></pre>
+<pre class="r"><code># you can see all possible 18 geometry types using 
+levels(st_geometry_type(aoi_boundary_HARV))</code></pre>
+<pre><code>##  [1] &quot;GEOMETRY&quot;           &quot;POINT&quot;              &quot;LINESTRING&quot;        
+##  [4] &quot;POLYGON&quot;            &quot;MULTIPOINT&quot;         &quot;MULTILINESTRING&quot;   
+##  [7] &quot;MULTIPOLYGON&quot;       &quot;GEOMETRYCOLLECTION&quot; &quot;CIRCULARSTRING&quot;    
+## [10] &quot;COMPOUNDCURVE&quot;      &quot;CURVEPOLYGON&quot;       &quot;MULTICURVE&quot;        
+## [13] &quot;MULTISURFACE&quot;       &quot;CURVE&quot;              &quot;SURFACE&quot;           
+## [16] &quot;POLYHEDRALSURFACE&quot;  &quot;TIN&quot;                &quot;TRIANGLE&quot;</code></pre>
+<pre class="r"><code># note some are more useful than others
+# lets look at the CRS
+st_crs(aoi_boundary_HARV)</code></pre>
+<pre><code>## Coordinate Reference System:
+##   EPSG: 32618 
+##   proj4string: &quot;+proj=utm +zone=18 +datum=WGS84 +units=m +no_defs&quot;</code></pre>
+<pre class="r"><code># Our data in the CRS UTM zone 18N. The CRS is critical to interpreting the object’s extent values as it specifies units. To find the extent of our AOI, we can use st_bbox():
+st_bbox(aoi_boundary_HARV)</code></pre>
+<pre><code>##      xmin      ymin      xmax      ymax 
+##  732128.0 4713208.7  732251.1 4713359.2</code></pre>
+<p>We can also see this when we “view” the df</p>
+<pre class="r"><code>aoi_boundary_HARV</code></pre>
+<pre><code>## Simple feature collection with 1 feature and 1 field
+## geometry type:  POLYGON
+## dimension:      XY
+## bbox:           xmin: 732128 ymin: 4713209 xmax: 732251.1 ymax: 4713359
+## epsg (SRID):    32618
+## proj4string:    +proj=utm +zone=18 +datum=WGS84 +units=m +no_defs
+##   id                       geometry
+## 1  1 POLYGON ((732128 4713359, 7...</code></pre>
+</div>
+<div id="lets-visualise-using-ggplot" class="section level2">
+<h2>Let’s visualise using ggplot</h2>
+<pre class="r"><code>aoi_boundary_HARV %&gt;% ggplot() + 
+  geom_sf(size = 3, color = &quot;black&quot;, fill = &quot;cyan1&quot;) + 
+  ggtitle(&quot;AOI Boundary Plot&quot;) + 
+  coord_sf()</code></pre>
+<p><img src="06vectoropenshapefile_files/figure-html/visi1-1.png" width="672" /></p>
+</div>
+<div id="challenge-1" class="section level2">
+<h2>Challenge 1</h2>
+<pre class="r"><code># Using the steps above, import the HARV_roads and HARVtower_UTM18N layers into R. Call the HARV_roads object lines_HARV and the HARVtower_UTM18N point_HARV.
+# Answer the following questions:
+#
+#1. What type of R spatial object is created when you import each layer?
+#2. What is the CRS and extent for each object?
+#3.Do the files contain points, lines, or polygons?
+#4. How many spatial objects are in each file?
+
+lines_HARV &lt;- st_read(&quot;data/NEON-DS-Site-Layout-Files/HARV/HARV_roads.shp&quot;)</code></pre>
+<pre><code>## Reading layer `HARV_roads&#39; from data source `/Users/darya/Dropbox (Sydney Uni)/Training/19_09_11_ResBaz/19_01_11_ResBazGIS/data/NEON-DS-Site-Layout-Files/HARV/HARV_roads.shp&#39; using driver `ESRI Shapefile&#39;
+## Simple feature collection with 13 features and 15 fields
+## geometry type:  MULTILINESTRING
+## dimension:      XY
+## bbox:           xmin: 730741.2 ymin: 4711942 xmax: 733295.5 ymax: 4714260
+## epsg (SRID):    32618
+## proj4string:    +proj=utm +zone=18 +datum=WGS84 +units=m +no_defs</code></pre>
+<pre class="r"><code>point_HARV &lt;- st_read(&quot;data/NEON-DS-Site-Layout-Files/HARV/HARVtower_UTM18N.shp&quot;)</code></pre>
+<pre><code>## Reading layer `HARVtower_UTM18N&#39; from data source `/Users/darya/Dropbox (Sydney Uni)/Training/19_09_11_ResBaz/19_01_11_ResBazGIS/data/NEON-DS-Site-Layout-Files/HARV/HARVtower_UTM18N.shp&#39; using driver `ESRI Shapefile&#39;
+## Simple feature collection with 1 feature and 14 fields
+## geometry type:  POINT
+## dimension:      XY
+## bbox:           xmin: 732183.2 ymin: 4713265 xmax: 732183.2 ymax: 4713265
+## epsg (SRID):    32618
+## proj4string:    +proj=utm +zone=18 +datum=WGS84 +units=m +no_defs</code></pre>
+<pre class="r"><code>class(lines_HARV)</code></pre>
+<pre><code>## [1] &quot;sf&quot;         &quot;data.frame&quot;</code></pre>
+<pre class="r"><code>st_crs(lines_HARV)</code></pre>
+<pre><code>## Coordinate Reference System:
+##   EPSG: 32618 
+##   proj4string: &quot;+proj=utm +zone=18 +datum=WGS84 +units=m +no_defs&quot;</code></pre>
+<pre class="r"><code>st_bbox(lines_HARV)</code></pre>
+<pre><code>##      xmin      ymin      xmax      ymax 
+##  730741.2 4711942.0  733295.5 4714260.0</code></pre>
+<pre class="r"><code>nrow(lines_HARV)</code></pre>
+<pre><code>## [1] 13</code></pre>
+</div>
+<div id="recap" class="section level2">
+<h2>Recap</h2>
+<ul>
+<li>Shapefile metadata include geometry type, CRS, and extent.</li>
+<li>Load spatial objects into R with the st_read() function.</li>
+<li>Spatial objects can be plotted directly with ggplot using the geom_sf() function. No need to convert to a dataframe.</li>
+</ul>
 </div>
 
 

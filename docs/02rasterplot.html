@@ -284,7 +284,25 @@ $(document).ready(function () {
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="01rasterstructure.html">01rasterstructure</a>
+  <a href="01rasterstructure.html">1A Rasters</a>
+</li>
+<li>
+  <a href="02rasterplot.html">2A Plot Rasters</a>
+</li>
+<li>
+  <a href="03rasterreproject.html">3S Reproject Rasters</a>
+</li>
+<li>
+  <a href="04rastercalculations.html">4S Raster math</a>
+</li>
+<li>
+  <a href="06vectoropenshapefile.html">6D Vector</a>
+</li>
+<li>
+  <a href="07vectorshapefileattributes.html">7D Shapefile attributes</a>
+</li>
+<li>
+  <a href="08vectorcrs.html">8D? Vectors CRS</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -304,6 +322,144 @@ $(document).ready(function () {
 
 <div id="raster-structure" class="section level3">
 <h3>Raster structure</h3>
+<p>Questions: How can I create categorized or customized maps of raster data? How can I customize the color scheme of a raster image? How can I layer raster data in a single image?</p>
+<p>Objectives: Build customized plots for a single band raster using the ggplot2 package. Layer a raster dataset on top of a hillshade to create an elegant basemap.</p>
+<p>Plot Raster Data in R using ggplot</p>
+<pre class="r"><code>DSM_HARV_df &lt;- DSM_HARV_df %&gt;% mutate(fct_elevation = cut(HARV_dsmCrop, breaks = 3))
+
+ggplot() +
+    geom_bar(data = DSM_HARV_df, aes(fct_elevation))</code></pre>
+<p><img src="02rasterplot_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<p>We can get the cut off values by asking the unique values of fct_elevation</p>
+<pre class="r"><code>unique(DSM_HARV_df$fct_elevation)</code></pre>
+<pre><code>## [1] (379,416] (342,379] (305,342]
+## Levels: (305,342] (342,379] (379,416]</code></pre>
+<p>And we can get the count of values in each group using dplyr’s group_by() and count() functions:</p>
+<pre class="r"><code>DSM_HARV_df %&gt;%
+        group_by(fct_elevation) %&gt;%
+        count()</code></pre>
+<pre><code>## # A tibble: 3 x 2
+## # Groups:   fct_elevation [3]
+##   fct_elevation       n
+##   &lt;fct&gt;           &lt;int&gt;
+## 1 (305,342]      418891
+## 2 (342,379]     1530073
+## 3 (379,416]      370835</code></pre>
+<p>Customize the cut off values, groups for the ranges of 301–350 m, 351–400 m, and 401–450 m.</p>
+<pre class="r"><code>custom_bins &lt;- c(300, 350, 400, 450)
+
+DSM_HARV_df &lt;- DSM_HARV_df %&gt;%
+  mutate(fct_elevation_2 = cut(HARV_dsmCrop, breaks = custom_bins))
+
+unique(DSM_HARV_df$fct_elevation_2)</code></pre>
+<pre><code>## [1] (400,450] (350,400] (300,350]
+## Levels: (300,350] (350,400] (400,450]</code></pre>
+<p>And now we can plot our bar plot again, using the new groups:</p>
+<pre class="r"><code>ggplot() +
+  geom_bar(data = DSM_HARV_df, aes(fct_elevation_2))</code></pre>
+<p><img src="02rasterplot_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>As we did earlier, we can get the count of values in each group:</p>
+<pre class="r"><code>DSM_HARV_df %&gt;%
+  group_by(fct_elevation_2) %&gt;%
+  count()</code></pre>
+<pre><code>## # A tibble: 3 x 2
+## # Groups:   fct_elevation_2 [3]
+##   fct_elevation_2       n
+##   &lt;fct&gt;             &lt;int&gt;
+## 1 (300,350]        741815
+## 2 (350,400]       1567316
+## 3 (400,450]         10668</code></pre>
+<p>Using ggplot ploting each group with a different color:</p>
+<pre class="r"><code>ggplot() +
+  geom_raster(data = DSM_HARV_df , aes(x = x, y = y, fill = fct_elevation_2)) + 
+  coord_quickmap()</code></pre>
+<p><img src="02rasterplot_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p>Above plot, the default colors is used for the raster objects. We can make it nicer by specifying colors ourself. We can use the R built in sets of colors or ploting terrain using terrain.colors().</p>
+<pre class="r"><code>terrain.colors(3)</code></pre>
+<pre><code>## [1] &quot;#00A600FF&quot; &quot;#ECB176FF&quot; &quot;#F2F2F2FF&quot;</code></pre>
+<pre class="r"><code>ggplot() +
+ geom_raster(data = DSM_HARV_df , aes(x = x, y = y,
+                                      fill = fct_elevation_2)) + 
+    scale_fill_manual(values = terrain.colors(3)) + 
+    coord_quickmap()</code></pre>
+<p><img src="02rasterplot_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p>More Plot Formatting:</p>
+<p>We can have an object or variable such as my_col to specify a color set, in case we have multiple plot and we want to chnage the pallete for all them, so we can do that by changing the my_col</p>
+<p>we can also give a more meaningful name to legend</p>
+<p>Also giving a name to xlabel and ylabel using xlab() and ylab() commands.</p>
+<pre class="r"><code>my_col &lt;- terrain.colors(3)
+
+ggplot() +
+ geom_raster(data = DSM_HARV_df , aes(x = x, y = y,fill = fct_elevation_2)) + 
+    scale_fill_manual(values = my_col, name = &quot;Elevation&quot;) + 
+    coord_quickmap() </code></pre>
+<p><img src="02rasterplot_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p>What if we want to turn off the x and y labels, we shoud then use element_blank() to the relevant part of the theme() function.</p>
+<pre class="r"><code>ggplot() +
+ geom_raster(data = DSM_HARV_df , aes(x = x, y = y,
+                                      fill = fct_elevation_2)) + 
+    scale_fill_manual(values = my_col, name = &quot;Elevation&quot;) +
+    theme(axis.title = element_blank()) + 
+    coord_quickmap()</code></pre>
+<p><img src="02rasterplot_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p>Challenge:</p>
+<p>Create a plot of the Harvard Forest Digital Surface Model (DSM) that has: 1. Six classified ranges of values (break points) that are evenly divided among the range of pixel values. 2. Axis labels. 3. A plot title.</p>
+<pre class="r"><code>DSM_HARV_df &lt;- DSM_HARV_df  %&gt;%
+               mutate(fct_elevation_6 = cut(HARV_dsmCrop, breaks = 6)) 
+
+ my_col &lt;- terrain.colors(6)
+
+ggplot() +
+    geom_raster(data = DSM_HARV_df , aes(x = x, y = y,
+                                      fill = fct_elevation_6)) + 
+    scale_fill_manual(values = my_col, name = &quot;Elevation&quot;) + 
+    ggtitle(&quot;Classified Elevation Map - NEON Harvard Forest Field Site&quot;) +
+    xlab(&quot;UTM Westing Coordinate (m)&quot;) +
+    ylab(&quot;UTM Northing Coordinate (m)&quot;) + 
+    coord_quickmap()</code></pre>
+<p><img src="02rasterplot_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p>We can layer a raster on top of a hillshade raster for the same area, and use a transparency factor to create a 3-dimensional shaded effect. A hillshade is a raster that maps the shadows and texture that you would see from above when viewing terrain. We will add a custom color, making the plot grey.</p>
+<p>First we need to read the DSM hillshade data;</p>
+<pre class="r"><code>DSM_hill_HARV &lt;-
+  raster(&quot;data/NEON-DS-Airborne-Remote-Sensing/HARV/DSM/HARV_DSMhill.tif&quot;)
+
+DSM_hill_HARV</code></pre>
+<pre><code>## class      : RasterLayer 
+## dimensions : 1367, 1697, 2319799  (nrow, ncol, ncell)
+## resolution : 1, 1  (x, y)
+## extent     : 731453, 733150, 4712471, 4713838  (xmin, xmax, ymin, ymax)
+## crs        : +proj=utm +zone=18 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0 
+## source     : /Users/darya/Dropbox (Sydney Uni)/Training/19_09_11_ResBaz/19_01_11_ResBazGIS/data/NEON-DS-Airborne-Remote-Sensing/HARV/DSM/HARV_DSMhill.tif 
+## names      : HARV_DSMhill 
+## values     : -0.7136298, 0.9999997  (min, max)</code></pre>
+<p>Then convert it to the data frame:</p>
+<pre class="r"><code>DSM_hill_HARV_df &lt;- as.data.frame(DSM_hill_HARV, xy = TRUE) 
+
+str(DSM_hill_HARV_df)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    2319799 obs. of  3 variables:
+##  $ x           : num  731454 731454 731456 731456 731458 ...
+##  $ y           : num  4713838 4713838 4713838 4713838 4713838 ...
+##  $ HARV_DSMhill: num  NA NA NA NA NA NA NA NA NA NA ...</code></pre>
+<p>Then plot it using ggplot:</p>
+<pre class="r"><code>ggplot() +
+  geom_raster(data = DSM_hill_HARV_df,
+              aes(x = x, y = y, alpha = HARV_DSMhill)) + 
+  scale_alpha(range =  c(0.15, 0.65), guide = &quot;none&quot;) + 
+  coord_quickmap()</code></pre>
+<p><img src="02rasterplot_files/figure-html/unnamed-chunk-15-1.png" width="672" /> Note: turn off the legend by adding guide = “none” to the scale_alpha function or theme(legend.position = “none”).</p>
+<p>We can layer another raster on top of our hillshade by adding another call to the geom_raster() function.</p>
+<pre class="r"><code>ggplot() +
+  geom_raster(data = DSM_HARV_df , 
+              aes(x = x, y = y, 
+                  fill = HARV_dsmCrop)) + 
+  geom_raster(data = DSM_hill_HARV_df, 
+              aes(x = x, y = y, 
+                  alpha = HARV_DSMhill)) +  
+  scale_fill_viridis_c() +  
+  scale_alpha(range = c(0.15, 0.65), guide = &quot;none&quot;) +  
+  ggtitle(&quot;Elevation with hillshade&quot;) +
+  coord_quickmap()</code></pre>
+<p><img src="02rasterplot_files/figure-html/unnamed-chunk-16-1.png" width="672" /> Note: The advantages of viridis palette: 1. a continuous blue to yellow scale that renders detail much more clearly than other palettes 2. the viridis palette is visible to those with color blindness. 3.the viridis palette translates readily to a well-differentiated grey-scale.</p>
 <p>Notes on raster structure</p>
 </div>
 

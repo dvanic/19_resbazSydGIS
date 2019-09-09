@@ -1,3 +1,3 @@
-### Raster structure
+### Vector CRS
 
 Notes on raster structure
