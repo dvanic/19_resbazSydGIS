@@ -14,3 +14,10 @@
 #2. What is the CRS and extent for each object?
 #3.Do the files contain points, lines, or polygons?
 #4. How many spatial objects are in each file?
+
+# Challenge 2 (RENUMBER LATER!)
+# Explore the attributes associated with the point_HARV and aoi_boundary_HARV spatial objects.
+# 1. How many attributes does each have?
+# 2. Who owns the site in the point_HARV data object?
+# 3. Which of the following is NOT an attribute of the point_HARV data object?
+# 4. A) Latitude B) County C) Country
