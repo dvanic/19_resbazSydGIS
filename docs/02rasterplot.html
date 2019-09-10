@@ -284,7 +284,25 @@ $(document).ready(function () {
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="01rasterstructure.html">01rasterstructure</a>
+  <a href="01rasterstructure.html">1A Rasters</a>
+</li>
+<li>
+  <a href="02rasterplot.html">2A Plot Rasters</a>
+</li>
+<li>
+  <a href="03rasterreproject.html">3S Reproject Rasters</a>
+</li>
+<li>
+  <a href="04rastercalculations.html">4S Raster math</a>
+</li>
+<li>
+  <a href="06vectoropenshapefile.html">6D Vector</a>
+</li>
+<li>
+  <a href="07vectorshapefileattributes.html">7D Shapefile attributes</a>
+</li>
+<li>
+  <a href="08vectorcrs.html">8D? Vectors CRS</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -304,7 +322,233 @@ $(document).ready(function () {
 
 <div id="raster-structure" class="section level3">
 <h3>Raster structure</h3>
-<p>Notes on raster structure</p>
+<p>Questions:</p>
+<ul>
+<li>How can I create categorized or customized maps of raster data?</li>
+<li>How can I customize the color scheme of a raster image?</li>
+<li>How can I layer raster data in a single image?</li>
+</ul>
+<p>Objectives:</p>
+<ul>
+<li>Build customized plots for a single band raster using the ggplot2 package.</li>
+<li>Layer a raster dataset on top of a hillshade to create an elegant basemap.</li>
+</ul>
+<p>This episode covers how to plot a raster in R using the ggplot2 package with customized coloring schemes. It also covers how to layer a raster on top of a hillshade to produce an eloquent map. We will continue working with the Digital Surface Model (DSM) raster for the NEON Harvard Forest Field Site.</p>
+</div>
+<div id="plot-raster-data-in-r-with-breaks" class="section level3">
+<h3>Plot Raster Data in R with breaks</h3>
+<p>In the previous episode, we viewed our data using a continuous color ramp. For clarity and visibility of the plot, we may prefer to view the data “symbolized” or colored according to ranges of values. This is comparable to a “classified” map. To do this, we need to tell ggplot how many groups to break our data into, and where those breaks should be. To make these decisions, it is useful to first explore the distribution of the data using a bar plot. To begin with, we will use dplyr’s mutate() function combined with cut() to split the data into 3 bins.</p>
+<pre class="r"><code>DSM_HARV_df &lt;- DSM_HARV_df %&gt;% mutate(fct_elevation = cut(HARV_dsmCrop, breaks = 3))
+
+DSM_HARV_df %&gt;%
+ggplot() +
+    geom_bar(aes(fct_elevation))</code></pre>
+<p><img src="02rasterplot_files/figure-html/DataBreaks-1.png" width="672" /></p>
+<p>If we want to know the cutoff values for the groups, we can ask for the unique values of fct_elevation:</p>
+<pre class="r"><code>unique(DSM_HARV_df$fct_elevation)</code></pre>
+<pre><code>## [1] (379,416] (342,379] (305,342]
+## Levels: (305,342] (342,379] (379,416]</code></pre>
+<p>And we can get the count of values in each group using dplyr’s group_by() and count() functions:</p>
+<pre class="r"><code>DSM_HARV_df %&gt;%
+        group_by(fct_elevation) %&gt;%
+        count()</code></pre>
+<pre><code>## # A tibble: 3 x 2
+## # Groups:   fct_elevation [3]
+##   fct_elevation       n
+##   &lt;fct&gt;           &lt;int&gt;
+## 1 (305,342]      418891
+## 2 (342,379]     1530073
+## 3 (379,416]      370835</code></pre>
+<p>We might prefer to customize the cutoff values for these groups. Lets round the cutoff values so that we have groups for the ranges of 301–350 m, 351–400 m, and 401–450 m. To implement this we will give mutate() a numeric vector of break points instead of the number of breaks we want.</p>
+<pre class="r"><code>DSM_HARV_df &lt;- DSM_HARV_df %&gt;%
+  mutate(fct_elevation_2 = cut(HARV_dsmCrop, 
+                               breaks = c(300, 350, 400, 450)))
+
+unique(DSM_HARV_df$fct_elevation_2)</code></pre>
+<pre><code>## [1] (400,450] (350,400] (300,350]
+## Levels: (300,350] (350,400] (400,450]</code></pre>
+<p>And now we can plot our bar plot again, using the new groups:</p>
+<pre class="r"><code>ggplot() +
+  geom_bar(data = DSM_HARV_df, aes(fct_elevation_2))</code></pre>
+<p><img src="02rasterplot_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>As we did earlier, we can get the count of values in each group:</p>
+<pre class="r"><code>DSM_HARV_df %&gt;%
+  group_by(fct_elevation_2) %&gt;%
+  count()</code></pre>
+<pre><code>## # A tibble: 3 x 2
+## # Groups:   fct_elevation_2 [3]
+##   fct_elevation_2       n
+##   &lt;fct&gt;             &lt;int&gt;
+## 1 (300,350]        741815
+## 2 (350,400]       1567316
+## 3 (400,450]         10668</code></pre>
+<p>Using ggplot ploting each group with a different color:</p>
+<pre class="r"><code>DSM_HARV_df %&gt;%
+  ggplot() +
+  geom_raster(aes(x = x, y = y, fill = fct_elevation_2)) + 
+  coord_quickmap()</code></pre>
+<p><img src="02rasterplot_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p>In the above plot, the default colours are used for the raster objects. We can make the figure nicer by specifying the colours ourselves. We can use a special colour pallette called terrain.colors().</p>
+<p>The terrain.colors() function returns hex colors - each of these character strings represents a color. To use these in our map, we pass them across using the scale_fill_manual() function.</p>
+<pre class="r"><code>terrain.colors(3)</code></pre>
+<pre><code>## [1] &quot;#00A600FF&quot; &quot;#ECB176FF&quot; &quot;#F2F2F2FF&quot;</code></pre>
+<pre class="r"><code>DSM_HARV_df %&gt;%
+  ggplot() +
+ geom_raster(aes(x = x, y = y, fill = fct_elevation_2)) +
+  scale_fill_manual(values = terrain.colors(3), name = &quot;Elevation&quot;) + coord_quickmap() + 
+  # get rid of axes titles (demo this slowly)
+  theme(axis.title = element_blank())</code></pre>
+<p><img src="02rasterplot_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<pre class="r"><code># Challenge:
+# 
+# Create a plot of the Harvard Forest Digital Surface Model (DSM) that has:
+# 1. Six classified ranges of values (break points) that are evenly divided among the range of pixel values.
+# 2. Axis labels.
+# 3. A plot title.
+
+DSM_HARV_df &lt;- DSM_HARV_df  %&gt;%
+               mutate(fct_elevation_6 = cut(HARV_dsmCrop, breaks = 6)) 
+
+DSM_HARV_df %&gt;%
+  ggplot() +
+  geom_raster(aes(x = x, y = y,fill = fct_elevation_6)) +
+  scale_fill_manual(values = terrain.colors(6), name = &quot;Elevation&quot;) +
+  ggtitle(&quot;Classified Elevation Map - NEON Harvard Forest Field Site&quot;) +
+  xlab(&quot;UTM Westing Coordinate (m)&quot;) +
+  ylab(&quot;UTM Northing Coordinate (m)&quot;) + 
+  coord_quickmap()</code></pre>
+<p><img src="02rasterplot_files/figure-html/Ch4-1.png" width="672" /></p>
+</div>
+<div id="layering-rasters" class="section level2">
+<h2>Layering Rasters</h2>
+<p>We can layer a raster on top of a hillshade raster for the same area, and use a transparency factor to create a 3-dimensional shaded effect. A <strong>hillshade</strong> is a raster that maps the shadows and texture that you would see from above when viewing terrain. We will add a custom color, making the plot grey.</p>
+<p>First we need to read the DSM hillshade data;</p>
+<pre class="r"><code>DSM_hill_HARV &lt;-
+  raster(&quot;data/NEON-DS-Airborne-Remote-Sensing/HARV/DSM/HARV_DSMhill.tif&quot;)
+
+DSM_hill_HARV</code></pre>
+<pre><code>## class      : RasterLayer 
+## dimensions : 1367, 1697, 2319799  (nrow, ncol, ncell)
+## resolution : 1, 1  (x, y)
+## extent     : 731453, 733150, 4712471, 4713838  (xmin, xmax, ymin, ymax)
+## crs        : +proj=utm +zone=18 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0 
+## source     : /Users/darya/Dropbox (Sydney Uni)/Training/19_09_11_ResBaz/19_01_11_ResBazGIS/data/NEON-DS-Airborne-Remote-Sensing/HARV/DSM/HARV_DSMhill.tif 
+## names      : HARV_DSMhill 
+## values     : -0.7136298, 0.9999997  (min, max)</code></pre>
+<p>Then convert it to a data frame:</p>
+<pre class="r"><code>DSM_hill_HARV_df &lt;- as.data.frame(DSM_hill_HARV, xy = TRUE) 
+
+str(DSM_hill_HARV_df)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    2319799 obs. of  3 variables:
+##  $ x           : num  731454 731454 731456 731456 731458 ...
+##  $ y           : num  4713838 4713838 4713838 4713838 4713838 ...
+##  $ HARV_DSMhill: num  NA NA NA NA NA NA NA NA NA NA ...</code></pre>
+<p>Then plot it using ggplot:</p>
+<pre class="r"><code>DSM_hill_HARV_df %&gt;%
+  ggplot() +
+  geom_raster(aes(x = x, y = y, alpha = HARV_DSMhill)) + 
+  scale_alpha(range =  c(0.15, 0.65), guide = &quot;none&quot;) + 
+  coord_quickmap() +
+  # turn off legend
+  theme(legend.position = &quot;none&quot;)</code></pre>
+<p><img src="02rasterplot_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p>We can layer another raster on top of our hillshade by adding another call to the geom_raster() function.</p>
+<pre class="r"><code>DSM_HARV_df %&gt;%
+  ggplot() +
+  geom_raster(aes(x = x, y = y, fill = HARV_dsmCrop)) + 
+  geom_raster(data = DSM_hill_HARV_df, 
+              aes(x = x, y = y, 
+                  alpha = HARV_DSMhill)) +  
+  scale_fill_viridis_c(name = &quot;Elevation&quot;) +  
+  scale_alpha(range = c(0.15, 0.65), guide = &quot;none&quot;) +  
+  ggtitle(&quot;Elevation with hillshade&quot;) +
+  coord_quickmap()</code></pre>
+<p><img src="02rasterplot_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<pre class="r"><code># Challenge 5
+# Create DTM &amp; DSM for SJER (SKIP IF LOW ON TIME)
+# 1. Use the files in the NEON_RemoteSensing/SJER/ directory to create a Digital Terrain 
+# 2. Model map and Digital Surface Model map of the San Joaquin Experimental Range field site.
+# 3. Make sure to:
+# 
+# - include hillshade in the maps,
+# - label axes on the DSM map and exclude them from the DTM map,
+# - include a title for each map,
+# - experiment with various alpha values and color palettes to represent the data.
+#
+#
+# CREATE DSM MAPS
+
+# import DSM data
+DSM_SJER &lt;- raster(&quot;data/NEON-DS-Airborne-Remote-Sensing/SJER/DSM/SJER_dsmCrop.tif&quot;)
+# convert to a df for plotting
+DSM_SJER_df &lt;- as.data.frame(DSM_SJER, xy = TRUE)
+
+# import DSM hillshade
+DSM_hill_SJER &lt;- raster(&quot;data/NEON-DS-Airborne-Remote-Sensing/SJER/DSM/SJER_dsmHill.tif&quot;)
+# convert to a df for plotting
+DSM_hill_SJER_df &lt;- as.data.frame(DSM_hill_SJER, xy = TRUE)
+
+# Build Plot
+ggplot() +
+    geom_raster(data = DSM_SJER_df , 
+                aes(x = x, y = y, 
+                     fill = SJER_dsmCrop,
+                     alpha = 0.8)
+                ) + 
+    geom_raster(data = DSM_hill_SJER_df, 
+                aes(x = x, y = y, 
+                  alpha = SJER_dsmHill)
+                ) +
+    scale_fill_viridis_c() +
+    guides(fill = guide_colorbar()) +
+    scale_alpha(range = c(0.4, 0.7), guide = &quot;none&quot;) +
+    # remove grey background and grid lines
+    theme_bw() + 
+    theme(panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank()) +
+    xlab(&quot;UTM Westing Coordinate (m)&quot;) +
+    ylab(&quot;UTM Northing Coordinate (m)&quot;) +
+    ggtitle(&quot;DSM with Hillshade&quot;) +
+    coord_quickmap()</code></pre>
+<p><img src="02rasterplot_files/figure-html/Ch5-1.png" width="672" /></p>
+<pre class="r"><code># CREATE DTM MAP
+# import DTM
+DTM_SJER &lt;- raster(&quot;data/NEON-DS-Airborne-Remote-Sensing/SJER/DTM/SJER_dtmCrop.tif&quot;)
+DTM_SJER_df &lt;- as.data.frame(DTM_SJER, xy = TRUE)
+
+# DTM Hillshade
+DTM_hill_SJER &lt;- raster(&quot;data/NEON-DS-Airborne-Remote-Sensing/SJER/DTM/SJER_dtmHill.tif&quot;)
+DTM_hill_SJER_df &lt;- as.data.frame(DTM_hill_SJER, xy = TRUE)
+
+ggplot() +
+    geom_raster(data = DTM_SJER_df ,
+                aes(x = x, y = y,
+                     fill = SJER_dtmCrop,
+                     alpha = 2.0)
+                ) +
+    geom_raster(data = DTM_hill_SJER_df,
+                aes(x = x, y = y,
+                  alpha = SJER_dtmHill)
+                ) +
+    scale_fill_viridis_c() +
+    guides(fill = guide_colorbar()) +
+    scale_alpha(range = c(0.4, 0.7), guide = &quot;none&quot;) +
+    theme_bw() +
+    theme(panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank()) +
+    theme(axis.title.x = element_blank(),
+          axis.title.y = element_blank()) +
+    ggtitle(&quot;DTM with Hillshade&quot;) +
+    coord_quickmap()</code></pre>
+<p><img src="02rasterplot_files/figure-html/Ch5-2.png" width="672" /></p>
+<div id="summary" class="section level3">
+<h3>Summary</h3>
+<ol style="list-style-type: decimal">
+<li>Continuous data ranges can be grouped into categories using mutate() and cut().</li>
+<li>Use built-in terrain.colors() or set your preferred color scheme manually.</li>
+<li>Layer rasters on top of one another by using the alpha aesthetic.</li>
+</ol>
+</div>
 </div>
 
 

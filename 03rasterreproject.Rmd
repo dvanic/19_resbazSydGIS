@@ -3,9 +3,16 @@
 ## Initial Setup and exploration
 **Task:** Import two geoTiffs, investigate ggplot behaviour when plotting them on top of each other. Explain behaviour by comparing projections of the two geoTiffs.
 
-Load the raster library
-```{r}
+
+```{r loadStuff, echo=F, warning=F, message=F}
+library(sp)
 library(raster)
+library(rgdal)
+library(tidyverse)
+DSM_HARV <- raster("data/NEON-DS-Airborne-Remote-Sensing/HARV/DSM/HARV_dsmCrop.tif")
+DSM_HARV_df <- as.data.frame(DSM_HARV, xy = TRUE)
+
+
 ```
 
 Import dtmCrop and dtmHill_WGS84 geoTiffs

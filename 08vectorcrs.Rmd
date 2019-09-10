@@ -1,3 +1,106 @@
-### Raster structure
+### Vector CRS
 
-Notes on raster structure
+- Questions: What do I do when vector data don’t line up?
+- Objectives: Plot vector objects with different CRSs in the same plot.
+
+```{r loadData, echo=FALSE}
+library(sf)
+library(tidyverse)
+theme_set(theme_minimal())
+point_HARV <- st_read("data/NEON-DS-Site-Layout-Files/HARV/HARVtower_UTM18N.shp")
+
+```
+
+
+### Case scenario:
+- Working With Spatial Data From Different Sources
+
+Some reasons for data being in different CRSs include:
+
+1. The data are stored in a particular CRS convention used by the data provider (for example, a government agency).
+2. The data are stored in a particular CRS that is customized to a region. For instance, many states in the US prefer to use a State Plane projection customized for that state.
+
+There are R packages for accessing US census data, and Australian census data - eechidna. 
+
+#### Read US Boundary File
+
+```{r readData}
+state_boundary_US <- st_read("data/NEON-DS-Site-Layout-Files/US-Boundary-Layers/US-State-Boundaries-Census-2014.shp")
+```
+```{r plot}
+state_boundary_US %>%
+  ggplot() +
+  geom_sf() +
+  ggtitle("Map of Contiguous US State Boundaries") +
+  coord_sf()
+```
+
+Add a boundary layer of the United States to our map - to make it look nicer. 
+
+```{r}
+country_boundary_US <- st_read("data/NEON-DS-Site-Layout-Files/US-Boundary-Layers/US-Boundary-Dissolved-States.shp")
+```
+If we specify a thicker line width using size = 2 for the border layer, it will make our map pop! We will also manually set the colors of the state boundaries and country boundaries.
+
+```{r}
+country_boundary_US %>%
+  ggplot() +
+  geom_sf(color = "gray18", size = 2) +
+  geom_sf(data = state_boundary_US, color = "gray40") +
+  ggtitle("Map of Contiguous US State Boundaries") +
+  coord_sf()
+```
+Next, let’s add the location of a flux tower where our study area is. As we are adding these layers, take note of the CRS of each object. 
+
+We saw in an earlier episode that when working with raster data in different CRSs, we needed to convert all objects to the same CRS. We can do the same thing with our vector data - however, we don’t need to! When using the ggplot2 package, ggplot automatically converts all objects to the same CRS before plotting. This means we can plot our three data sets together without doing any conversion:
+
+```{r}
+country_boundary_US %>%
+  ggplot() +
+  geom_sf(size = 2, color = "gray18") +
+  geom_sf(data = state_boundary_US, color = "gray40") +
+  geom_sf(data = point_HARV, shape = 19, color = "purple") +
+  ggtitle("Map of Contiguous US State Boundaries") +
+  coord_sf()
+```
+
+But not all libraries are this convenient, and it doesn't help us with vector math!
+
+Let's get them into the same CRS:
+
+```{r}
+st_crs(point_HARV)
+
+st_crs(state_boundary_US)
+st_crs(country_boundary_US)
+```
+
+To convert:
+
+```{r Convert}
+point_HARV_4326 <- st_transform(point_HARV, 4326)
+st_transform(point_HARV, st_crs(state_boundary_US))
+st_transform(point_HARV, as.character(st_crs(state_boundary_US))[2])
+```
+
+```{r Challenge4}
+# Create a map of the North Eastern United States as follows:
+# 1. Import and plot Boundary-US-State-NEast.shp. Adjust line width as necessary.
+# 2. Layer the Fisher Tower (in the NEON Harvard Forest site) point location point_HARV onto the plot.
+# 3. Add a title.
+# 4. Add a legend that shows both the state boundary (as a line) and the Tower location point.
+NE.States.Boundary.US <- st_read("data/NEON-DS-Site-Layout-Files/US-Boundary-Layers/Boundary-US-State-NEast.shp")
+
+NE.States.Boundary.US %>% 
+  ggplot() +
+    geom_sf(aes(color ="color"), show.legend = "line") +
+    scale_color_manual(name = "", labels = "State Boundary", values = c("color" = "gray18")) +
+    geom_sf(data = point_HARV_4326, aes(shape = "shape"), color = "purple") +
+    scale_shape_manual(name = "", labels = "Fisher Tower", values = c("shape" = 19)) +
+    ggtitle("Fisher Tower location") +
+    theme(legend.background = element_rect(color = NA)) +
+    coord_sf()
+
+
+```
+

@@ -1,116 +1,87 @@
-### Open and Plot Shapefiles in R
+## Explore and Plot by Shapefile Attributes
 
-1. Questions:
-  - How can I distinguish between and visualize point, line and polygon vector data?
-
-2. Objectives
-
-  - Know the difference between point, line, and polygon vector elements.
-  - Load point, line, and polygon shapefiles into R.
-  - Access the attributes of a spatial object in R.
-
-The data we'll be using come from the NEON Harvard Forest field site, which we have been working with in previous episodes.
-
-```{r loadLibraries}
+```{r reloadData, echo=F}
 library(sf)
 library(tidyverse)
 theme_set(theme_minimal())
-```
-
-
-
-## Import shapefiles
-
-- We will use the `sf` package to work with vector data in R. This stands for "Spatial features".
-
-- `rgdal` automatically loads when `sf` is loaded. I'll mention here that there is another package called `sp`, which was the "old" one used to work with vector files in R. We will use `sf` in this course, as it is newer and more robust (as in, doesn't change the data type when doing things linke merges and joins) - but you sometimes will need to use `sp` with other R packages, most notably raster, - and you'll see it on stackoverflow. 
-
-
-The shapefiles that we will import are:
-- A polygon shapefile representing our field site boundary, which we'll call our Area Of Interest or AOI
-- A line shapefile representing roads
-- A point shapefile representing the location of the Fisher flux tower - which we will call "tower" from now on.
-
-
-```{r loadshapefile}
-# To import shapefiles we use the sf function st_read()
 aoi_boundary_HARV <- st_read("data/NEON-DS-Site-Layout-Files/HARV/HarClip_UTMZ18.shp")
+lines_HARV <- st_read("data/NEON-DS-Site-Layout-Files/HARV/HARV_roads.shp")
+point_HARV <- st_read("data/NEON-DS-Site-Layout-Files/HARV/HARVtower_UTM18N.shp")
 ```
 
-Let's look at the metadata of our shapefile...
+We can use the "usual" R ncol and dim functions from R to look at our objects:
 
-
-...
-
-- Note that the spatial extent for a shapefile represents the combined extent for all spatial objects in the shapefile.
-
-
-- There are commands to view this information from the R object as well. They start with "st", which I assume means "standard"?...
-
-```{r lookatmetadata}
-st_geometry_type(aoi_boundary_HARV)
-# you can see all possible 18 geometry types using 
-levels(st_geometry_type(aoi_boundary_HARV))
-# note some are more useful than others
-# lets look at the CRS
-st_crs(aoi_boundary_HARV)
-# Our data in the CRS UTM zone 18N. The CRS is critical to interpreting the object’s extent values as it specifies units. To find the extent of our AOI, we can use st_bbox():
-st_bbox(aoi_boundary_HARV)
-```
-
-We can also see this when we "view" the df
 ```{r}
-aoi_boundary_HARV
+dim(lines_HARV)
+lines_HARV %>% head()
+ncol(point_HARV)
 ```
 
-## Let's visualise using ggplot
-```{r visi1}
-aoi_boundary_HARV %>% ggplot() + 
-  geom_sf(size = 3, color = "black", fill = "cyan1") + 
-  ggtitle("AOI Boundary Plot") + 
+```{r ch2}
+# Explore the attributes associated with the point_HARV and aoi_boundary_HARV spatial objects.
+# 
+#     How many attributes does each have?
+#     Who owns the site in the point_HARV data object?
+# 
+#     Which of the following is NOT an attribute of the point_HARV data object?
+# 
+# A) Latitude 
+# B) County 
+# C) Country
+# 
+```
+
+Because this is R, we can use standard R operations to access specific columns of the sf dataframe:
+
+```{r standardOps}
+lines_HARV$TYPE
+levels(lines_HARV$TYPE)
+
+```
+Furthermore, we can use dplyr commands to work with our object just like a dataframe - because that's what it is:
+
+```{r}
+class(lines_HARV)
+```
+
+Let's plot only the footpaths:
+
+```{r}
+lines_HARV %>%   ggplot() + geom_sf() 
+
+lines_HARV %>% 
+  filter(TYPE == "footpath") %>% 
+  ggplot() + geom_sf() 
+```
+
+Now let's plot all of the different road types, colouring them in by type:
+
+```{r}
+# First, how many road types are there?
+levels(lines_HARV$TYPE)
+
+
+# let's build up the ggplot
+lines_HARV %>%
+  ggplot() + 
+  geom_sf(aes(col = TYPE)) +
+  scale_color_manual(values = c("red", "green", "blue", "magenta")) +
+  ggtitle("NEON Harvard Forest Field Site", subtitle = "Roads Where Bikes and Horses Are Allowed") + 
   coord_sf()
 ```
 
+```{r Ch3}
+# Create a map of the state boundaries in the United States using the data located in your downloaded data folder: # NEON-DS-Site-Layout-Files/US-Boundary-Layers\US-State-Boundaries-Census-2014. 
+# Apply a fill color to each state using its region value. Add a legend.
 
-## Challenge 1
-
-```{r ch1}
-# Using the steps above, import the HARV_roads and HARVtower_UTM18N layers into R. Call the HARV_roads object lines_HARV and the HARVtower_UTM18N point_HARV.
-# Answer the following questions:
-#
-#1. What type of R spatial object is created when you import each layer?
-#2. What is the CRS and extent for each object?
-#3.Do the files contain points, lines, or polygons?
-#4. How many spatial objects are in each file?
-
+state_boundary_US <- 
+st_read("data/NEON-DS-Site-Layout-Files/US-Boundary-Layers/US-State-Boundaries-Census-2014.shp")
+levels(state_boundary_US$region)
+colors <- c("purple", "springgreen", "yellow", "brown", "navy")
+ggplot() +
+  geom_sf(data = state_boundary_US, aes(color = region), size = 1) +
+  scale_color_manual(values = colors) +
+  ggtitle("Contiguous U.S. State Boundaries") + 
+  coord_sf()
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
