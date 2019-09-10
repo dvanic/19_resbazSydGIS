@@ -2,7 +2,8 @@
 # 01 Raster structure --------
 ## Challenge 1
 # Challenge: What units are our data in?
-
+## Challenge 2
+# Challenge: Use the output from the GDALinfo() function to find out what NoDataValue is used for our DSM_HARV dataset.
 
 
 # 03 Reproject Rasters in R ---------
