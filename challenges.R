@@ -30,3 +30,9 @@
 # 2. Who owns the site in the point_HARV data object?
 # 3. Which of the following is NOT an attribute of the point_HARV data object?
 # 4. A) Latitude B) County C) Country
+
+# Challenge 3 (RENUMBER LATER!)
+# 1. Create a map of the state boundaries in the United States using the data located in your downloaded data folder: 
+# NEON-DS-Site-Layout-Files/US-Boundary-Layers\US-State-Boundaries-Census-2014. 
+# 2. Apply a fill color to each state using its region value. 
+# 3. Add a legend.

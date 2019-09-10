@@ -25,7 +25,9 @@ ncol(point_HARV)
 # 
 #     Which of the following is NOT an attribute of the point_HARV data object?
 # 
-#     A) Latitude B) County C) Country
+# A) Latitude 
+# B) County 
+# C) Country
 # 
 ```
 
@@ -52,22 +54,34 @@ lines_HARV %>%
   ggplot() + geom_sf() 
 ```
 
-Now let's plot all of the different road types, colouring them in by type, and using linetype to indicate whether or not only bicycles and horses are allowed on them
+Now let's plot all of the different road types, colouring them in by type:
 
 ```{r}
 # First, how many road types are there?
 levels(lines_HARV$TYPE)
-# Bicycles/horses
-levels(lines_HARV$BicyclesHo)
 
-
-#lines_removeNA <- lines_HARV[!is.na(lines_HARV$BicyclesHo),]
-#put in pull request
 
 # let's build up the ggplot
 lines_HARV %>%
-  mutate(BicyclesHo = replace_na(BicyclesHo, "Unknown")) %>%
-  mutate(BikeHorse = BicyclesHo != "Bicycles and Horses Allowed") %>%
-  ggplot(aes( col=TYPE,lty = BikeHorse)) + geom_sf()
+  ggplot() + 
+  geom_sf(aes(col = TYPE)) +
+  scale_color_manual(values = c("red", "green", "blue", "magenta")) +
+  ggtitle("NEON Harvard Forest Field Site", subtitle = "Roads Where Bikes and Horses Are Allowed") + 
+  coord_sf()
+```
+
+```{r Ch3}
+# Create a map of the state boundaries in the United States using the data located in your downloaded data folder: # NEON-DS-Site-Layout-Files/US-Boundary-Layers\US-State-Boundaries-Census-2014. 
+# Apply a fill color to each state using its region value. Add a legend.
+
+state_boundary_US <- 
+st_read("data/NEON-DS-Site-Layout-Files/US-Boundary-Layers/US-State-Boundaries-Census-2014.shp")
+levels(state_boundary_US$region)
+colors <- c("purple", "springgreen", "yellow", "brown", "navy")
+ggplot() +
+  geom_sf(data = state_boundary_US, aes(color = region), size = 1) +
+  scale_color_manual(values = colors) +
+  ggtitle("Contiguous U.S. State Boundaries") + 
+  coord_sf()
 ```
 
