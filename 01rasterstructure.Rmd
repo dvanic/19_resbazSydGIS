@@ -1,11 +1,13 @@
 ### Raster structure
 
 Questions:
+
 - What is a raster dataset?
 - How do I work with and plot raster data in R?
 - How can I handle missing or bad data values for a raster?
 
 Objectives:
+
 - Describe the fundamental attributes of a raster dataset.
 - Explore raster attributes and metadata using R.
 - Import rasters into R using the raster package.
@@ -100,50 +102,86 @@ crs(DSM_HARV)
 
 
 Understanding CRS in Proj4 Format:
-proj=utm: the projection is UTM, UTM has several zones.
-zone=18: the zone is 18
-datum=WGS84: the datum is WGS84 (the datum refers to the 0,0 reference for the coordinate system used in the projection)
-units=m: the units for the coordinates are in meters
-ellps=WGS84: the ellipsoid (how the earth’s roundness is calculated) for the data is WGS84
 
-Calculate Raster Min and Max Values
-```{r}
+- proj=utm: the projection is UTM, UTM has several zones.
+- zone=18: the zone is 18
+- datum=WGS84: the datum is WGS84 (the datum refers to the 0,0 reference for the coordinate system used in the projection)
+- units=m: the units for the coordinates are in meters
+- ellps=WGS84: the ellipsoid (how the earth’s roundness is calculated) for the data is WGS84
+
+### Calculate Raster Min and Max Values
+
+It is useful to know the minimum or maximum values of a raster dataset. In this case, given we are working with elevation data, these values represent the min/max elevation range at our site.
+
+```{r minmax}
 minValue(DSM_HARV)
-```
-```{r}
 maxValue(DSM_HARV)
 ```
 
-Set min and max values:
+If the minimum and maximum values haven’t already been calculated, we can calculate them using the setMinMax() function.
+
 ```{r}
 DSM_HARV <- setMinMax(DSM_HARV)
 ```
 
 We can use the raster() function to import one single band from a single or multi-band raster. We can view the number of bands in a raster using the nlayers() function.
-```{r}
+
+```{r HowManyLayers}
 nlayers(DSM_HARV)
 ```
 
-To highlight NA values in ggplot, alter the scale_fill_*() layer to contain a colour instruction for NA values, like scale_fill_viridis_c(na.value = 'deeppink')
+### Dealing with Missing Data
+
+Raster data often has a NoDataValue associated with it. This is a value assigned to pixels where data is missing or no data were collected.
+
+
+Challenge: Use the output from the GDALinfo() function to find out what NoDataValue is used for our DSM_HARV dataset.
+
 
 ```{r}
 GDALinfo("data/NEON-DS-Airborne-Remote-Sensing/HARV/DSM/HARV_dsmCrop.tif")
+# 9999
 ```
 
-Bad Data Values in Rasters are different from NoDataValue(s)
+### Bad Data Values in Rasters are different from NoDataValue(s)
+
+Examples of Bad Data Values:
+
+- The normalized difference vegetation index (NDVI), which is a measure of greenness, has a valid range of -1 to 1. Any value outside of that range would be considered a “bad” or miscalculated value.
+- Reflectance data in an image will often range from 0-1 or 0-10,000 depending upon how the data are scaled. Thus a value greater than 1 or greater than 10,000 is likely caused by an error in either data collection or processing.
+
+
+#### Find Bad Data Values
+
+
+Plotting data with appropriate highlighting can help reveal patterns in bad values and may suggest a solution. Below, reclassification is used to highlight elevation values over 400m with a contrasting colour.
+
 
 Create A Histogram of Raster Values:
+
 ```{r}
-ggplot() +
-    geom_histogram(data = DSM_HARV_df, aes(HARV_dsmCrop))
+DSM_HARV_df %>%
+  ggplot() +
+  geom_histogram(aes(HARV_dsmCrop))
 ```
 
 
 ```{r}
-ggplot() +
-    geom_histogram(data = DSM_HARV_df, aes(HARV_dsmCrop), bins = 40)
+# Challenge
+#Use GDALinfo() to determine the following about the NEON-DS-Airborne-Remote-Sensing/HARV/DSM/HARV_DSMhill.tif file:
+# 1.Does this file have the same CRS as DSM_HARV?
+# 2. What is the NoDataValue?
+# 3. hat is resolution of the raster data?
+# 4. How large would a 5x5 pixel area be on the Earth’s surface?
+# 5. Is the file a multi- or single-band raster?
+
 ```
+1. If this file has the same CRS as DSM_HARV? Yes: UTM Zone 18, WGS84, meters.
+2. What format NoDataValues take? -9999
+3. The resolution of the raster data? 1x1
+4. How large a 5x5 pixel area would be? 5mx5m How? We are given resolution of 1x1 and units in meters, therefore resolution of 5x5 means 5x5m.
+5. Is the file a multi- or single-band raster? Single.
 
 
+Notice: this file is a hillshade. We will (not) learn about hillshades in the Working with Multi-band Rasters in R episode.
 
-Notes on raster structure

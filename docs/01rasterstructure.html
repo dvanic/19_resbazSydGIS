@@ -322,12 +322,25 @@ $(document).ready(function () {
 
 <div id="raster-structure" class="section level3">
 <h3>Raster structure</h3>
-<p>Questions: What is a raster dataset? How do I work with and plot raster data in R? How can I handle missing or bad data values for a raster?</p>
-<p>Objectives: Describe the fundamental attributes of a raster dataset. Explore raster attributes and metadata using R. Import rasters into R using the raster package. Plot a raster file in R using the ggplot2 package. Describe the difference between single- and multi-band rasters.</p>
-<p>installing the raster and rgdal packages: install.packages(“raster”). Note that for raster package you might need to install sp package using install.packages(“sp”) as wel ass install.packages(“rgdal”)</p>
-<pre class="r"><code>library(sp)
-library(raster)
-library(rgdal)</code></pre>
+<p>Questions:</p>
+<ul>
+<li>What is a raster dataset?</li>
+<li>How do I work with and plot raster data in R?</li>
+<li>How can I handle missing or bad data values for a raster?</li>
+</ul>
+<p>Objectives:</p>
+<ul>
+<li>Describe the fundamental attributes of a raster dataset.</li>
+<li>Explore raster attributes and metadata using R.</li>
+<li>Import rasters into R using the raster package.</li>
+<li>Plot a raster file in R using the ggplot2 package.</li>
+<li>Describe the difference between single- and multi-band rasters.</li>
+</ul>
+<p>Installing the raster and rgdal packages: install.packages(“raster”).</p>
+<p>Note that for raster package you might need to install sp package using install.packages(“sp”) as well as install.packages(“rgdal”)</p>
+<pre class="r"><code>library(raster)</code></pre>
+<pre><code>## Loading required package: sp</code></pre>
+<pre class="r"><code>library(rgdal)</code></pre>
 <pre><code>## rgdal: version: 1.4-4, (SVN revision 833)
 ##  Geospatial Data Abstraction Library extensions to R successfully loaded
 ##  Loaded GDAL runtime: GDAL 2.1.3, released 2017/20/01
@@ -342,18 +355,21 @@ library(rgdal)</code></pre>
 ##   [.quosures     rlang
 ##   c.quosures     rlang
 ##   print.quosures rlang</code></pre>
-<pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.2.1 ──</code></pre>
+<pre><code>## ── Attaching packages ──────────────────────────── tidyverse 1.2.1 ──</code></pre>
 <pre><code>## ✔ ggplot2 3.1.1     ✔ purrr   0.3.2
 ## ✔ tibble  2.1.3     ✔ dplyr   0.8.1
 ## ✔ tidyr   0.8.3     ✔ stringr 1.4.0
 ## ✔ readr   1.3.1     ✔ forcats 0.4.0</code></pre>
-<pre><code>## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+<pre><code>## ── Conflicts ─────────────────────────────── tidyverse_conflicts() ──
 ## ✖ tidyr::extract() masks raster::extract()
 ## ✖ dplyr::filter()  masks stats::filter()
 ## ✖ dplyr::lag()     masks stats::lag()
 ## ✖ dplyr::select()  masks raster::select()</code></pre>
-<p>First download the data using the link below: <a href="https://ndownloader.figshare.com/articles/2009586/versions/10" class="uri">https://ndownloader.figshare.com/articles/2009586/versions/10</a></p>
-<p>viewing the Raster file attributes</p>
+<pre class="r"><code># set the ggplot theme to minimal upfront
+theme_set(theme_minimal())</code></pre>
+<p>You should already have the data…</p>
+<p>First, let’s view the Raster file attributes</p>
+<p>We will be working with a series of GeoTIFF files in this lesson. The GeoTIFF format contains a set of embedded tags with metadata about the raster data. We can use the function GDALinfo() to get information about our raster data before we read that data into R. It is ideal to do this before importing your data.</p>
 <pre class="r"><code>GDALinfo(&quot;data/NEON-DS-Airborne-Remote-Sensing/HARV/DSM/HARV_dsmCrop.tif&quot;)</code></pre>
 <pre><code>## rows        1367 
 ## columns     1697 
@@ -376,11 +392,14 @@ library(rgdal)</code></pre>
 ## 1 305.07 416.07 359.8531 17.83169
 ## Metadata:
 ## AREA_OR_POINT=Area</code></pre>
-<p>Storing this information in R</p>
+<p>We can store this information in R</p>
 <pre class="r"><code>HARV_dsmCrop_info &lt;- capture.output(
   GDALinfo(&quot;data/NEON-DS-Airborne-Remote-Sensing/HARV/DSM/HARV_dsmCrop.tif&quot;)
 )</code></pre>
-<p>Open a Raster in R</p>
+<p>Each line of text that was printed to the console is now stored as an element of the character vector HARV_dsmCrop_info. We will be exploring this data throughout this episode. By the end of this episode, you will be able to explain and understand the output above.</p>
+</div>
+<div id="open-a-raster-in-r" class="section level3">
+<h3>Open a Raster in R</h3>
 <pre class="r"><code>DSM_HARV &lt;- 
   raster(&quot;data/NEON-DS-Airborne-Remote-Sensing/HARV/DSM/HARV_dsmCrop.tif&quot;)
 
@@ -396,12 +415,13 @@ DSM_HARV</code></pre>
 <pre class="r"><code>summary(DSM_HARV)</code></pre>
 <pre><code>## Warning in .local(object, ...): summary is an estimate based on a sample of 1e+05 cells (4.31% of all cells)</code></pre>
 <pre><code>##         HARV_dsmCrop
-## Min.          305.11
-## 1st Qu.       345.51
-## Median        359.56
-## 3rd Qu.       374.25
-## Max.          416.07
+## Min.          305.65
+## 1st Qu.       345.56
+## Median        359.57
+## 3rd Qu.       374.22
+## Max.          414.86
 ## NA&#39;s            0.00</code></pre>
+<p>Note the warning - unless you force R to calculate these statistics using every cell in the raster, it will take a random sample of 100,000 cells and calculate from that instead. To force calculation on more, or even all values, you can use the parameter maxsamp:</p>
 <pre class="r"><code>summary(DSM_HARV, maxsamp = ncell(DSM_HARV))</code></pre>
 <pre><code>##         HARV_dsmCrop
 ## Min.          305.07
@@ -410,37 +430,56 @@ DSM_HARV</code></pre>
 ## 3rd Qu.       374.28
 ## Max.          416.07
 ## NA&#39;s            0.00</code></pre>
-<p>convert it to a dataframe in order to plot it using ggplot2</p>
+<p>Convert it to a dataframe in order to plot it using ggplot2</p>
 <pre class="r"><code>DSM_HARV_df &lt;- as.data.frame(DSM_HARV, xy = TRUE)</code></pre>
-<p>can see a standard dataframe format</p>
+<p>Can see a standard dataframe format</p>
 <pre class="r"><code>str(DSM_HARV_df)</code></pre>
 <pre><code>## &#39;data.frame&#39;:    2319799 obs. of  3 variables:
 ##  $ x           : num  731454 731454 731456 731456 731458 ...
 ##  $ y           : num  4713838 4713838 4713838 4713838 4713838 ...
 ##  $ HARV_dsmCrop: num  409 408 407 407 409 ...</code></pre>
-<p>Note: in case ggplot is not installed install.packages(“ggplot2”) or install.packages(“ggplot2”, dependencies = TRUE), then check the packages to make sure it is ticked</p>
-<pre class="r"><code>ggplot() +
-  geom_raster(data = DSM_HARV_df , aes(x = x, y = y, fill = HARV_dsmCrop)) +   scale_fill_viridis_c() +
+<p>Let’s use ggplot to plot the raster.</p>
+<p>We will set the color scale to scale_fill_viridis_c which is a color-blindness friendly color scale. We will also use the coord_quickmap() function to use an approximate Mercator projection for our plots. This approximation is suitable for small areas that are not too close to the poles. Other coordinate systems are available in ggplot2 if needed, you can learn about them at their help page ?coord_map. (DEMO this here)</p>
+<pre class="r"><code>DSM_HARV_df %&gt;%
+  ggplot() +
+  geom_raster(aes(x = x, y = y, fill = HARV_dsmCrop)) +   scale_fill_viridis_c() +
   coord_quickmap()</code></pre>
-<p><img src="01rasterstructure_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
-<p>View Raster Coordinate Reference System (CRS) in R: We can view the CRS string associated with our R object using thecrs() function.</p>
-<pre class="r"><code>crs(DSM_HARV)</code></pre>
+<p><img src="01rasterstructure_files/figure-html/DemoGG-1.png" width="672" /></p>
+</div>
+<div id="view-raster-coordinate-reference-system-crs-in-r" class="section level3">
+<h3>View Raster Coordinate Reference System (CRS) in R:</h3>
+<p>We can view the CRS string associated with our R object using the crs() function.</p>
+<pre class="r"><code># Challenge: What units are our data in?
+crs(DSM_HARV)</code></pre>
 <pre><code>## CRS arguments:
 ##  +proj=utm +zone=18 +datum=WGS84 +units=m +no_defs +ellps=WGS84
 ## +towgs84=0,0,0</code></pre>
-<p>Challenge: What units are our data in?</p>
-<p>Understanding CRS in Proj4 Format: proj=utm: the projection is UTM, UTM has several zones. zone=18: the zone is 18 datum=WGS84: the datum is WGS84 (the datum refers to the 0,0 reference for the coordinate system used in the projection) units=m: the units for the coordinates are in meters ellps=WGS84: the ellipsoid (how the earth’s roundness is calculated) for the data is WGS84</p>
-<p>Calculate Raster Min and Max Values</p>
+<p>Understanding CRS in Proj4 Format:</p>
+<ul>
+<li>proj=utm: the projection is UTM, UTM has several zones.</li>
+<li>zone=18: the zone is 18</li>
+<li>datum=WGS84: the datum is WGS84 (the datum refers to the 0,0 reference for the coordinate system used in the projection)</li>
+<li>units=m: the units for the coordinates are in meters</li>
+<li>ellps=WGS84: the ellipsoid (how the earth’s roundness is calculated) for the data is WGS84</li>
+</ul>
+</div>
+<div id="calculate-raster-min-and-max-values" class="section level3">
+<h3>Calculate Raster Min and Max Values</h3>
+<p>It is useful to know the minimum or maximum values of a raster dataset. In this case, given we are working with elevation data, these values represent the min/max elevation range at our site.</p>
 <pre class="r"><code>minValue(DSM_HARV)</code></pre>
 <pre><code>## [1] 305.07</code></pre>
 <pre class="r"><code>maxValue(DSM_HARV)</code></pre>
 <pre><code>## [1] 416.07</code></pre>
-<p>Set min and max values:</p>
+<p>If the minimum and maximum values haven’t already been calculated, we can calculate them using the setMinMax() function.</p>
 <pre class="r"><code>DSM_HARV &lt;- setMinMax(DSM_HARV)</code></pre>
 <p>We can use the raster() function to import one single band from a single or multi-band raster. We can view the number of bands in a raster using the nlayers() function.</p>
 <pre class="r"><code>nlayers(DSM_HARV)</code></pre>
 <pre><code>## [1] 1</code></pre>
-<p>To highlight NA values in ggplot, alter the scale_fill_*() layer to contain a colour instruction for NA values, like scale_fill_viridis_c(na.value = ‘deeppink’)</p>
+</div>
+<div id="dealing-with-missing-data" class="section level3">
+<h3>Dealing with Missing Data</h3>
+<p>Raster data often has a NoDataValue associated with it. This is a value assigned to pixels where data is missing or no data were collected.</p>
+<p>Challenge: Use the output from the GDALinfo() function to find out what NoDataValue is used for our DSM_HARV dataset.</p>
 <pre class="r"><code>GDALinfo(&quot;data/NEON-DS-Airborne-Remote-Sensing/HARV/DSM/HARV_dsmCrop.tif&quot;)</code></pre>
 <pre><code>## rows        1367 
 ## columns     1697 
@@ -463,16 +502,40 @@ DSM_HARV</code></pre>
 ## 1 305.07 416.07 359.8531 17.83169
 ## Metadata:
 ## AREA_OR_POINT=Area</code></pre>
-<p>Bad Data Values in Rasters are different from NoDataValue(s)</p>
+<pre class="r"><code># 9999</code></pre>
+</div>
+<div id="bad-data-values-in-rasters-are-different-from-nodatavalues" class="section level3">
+<h3>Bad Data Values in Rasters are different from NoDataValue(s)</h3>
+<p>Examples of Bad Data Values:</p>
+<ul>
+<li>The normalized difference vegetation index (NDVI), which is a measure of greenness, has a valid range of -1 to 1. Any value outside of that range would be considered a “bad” or miscalculated value.</li>
+<li>Reflectance data in an image will often range from 0-1 or 0-10,000 depending upon how the data are scaled. Thus a value greater than 1 or greater than 10,000 is likely caused by an error in either data collection or processing.</li>
+</ul>
+<div id="find-bad-data-values" class="section level4">
+<h4>Find Bad Data Values</h4>
+<p>Plotting data with appropriate highlighting can help reveal patterns in bad values and may suggest a solution. Below, reclassification is used to highlight elevation values over 400m with a contrasting colour.</p>
 <p>Create A Histogram of Raster Values:</p>
-<pre class="r"><code>ggplot() +
-    geom_histogram(data = DSM_HARV_df, aes(HARV_dsmCrop))</code></pre>
+<pre class="r"><code>DSM_HARV_df %&gt;%
+  ggplot() +
+  geom_histogram(aes(HARV_dsmCrop))</code></pre>
 <pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
-<p><img src="01rasterstructure_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
-<pre class="r"><code>ggplot() +
-    geom_histogram(data = DSM_HARV_df, aes(HARV_dsmCrop), bins = 40)</code></pre>
-<p><img src="01rasterstructure_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
-<p>Notes on raster structure</p>
+<p><img src="01rasterstructure_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<pre class="r"><code># Challenge
+#Use GDALinfo() to determine the following about the NEON-DS-Airborne-Remote-Sensing/HARV/DSM/HARV_DSMhill.tif file:
+# 1.Does this file have the same CRS as DSM_HARV?
+# 2. What is the NoDataValue?
+# 3. hat is resolution of the raster data?
+# 4. How large would a 5x5 pixel area be on the Earth’s surface?
+# 5. Is the file a multi- or single-band raster?</code></pre>
+<ol style="list-style-type: decimal">
+<li>If this file has the same CRS as DSM_HARV? Yes: UTM Zone 18, WGS84, meters.</li>
+<li>What format NoDataValues take? -9999</li>
+<li>The resolution of the raster data? 1x1</li>
+<li>How large a 5x5 pixel area would be? 5mx5m How? We are given resolution of 1x1 and units in meters, therefore resolution of 5x5 means 5x5m.</li>
+<li>Is the file a multi- or single-band raster? Single.</li>
+</ol>
+<p>Notice: this file is a hillshade. We will (not) learn about hillshades in the Working with Multi-band Rasters in R episode.</p>
+</div>
 </div>
 
 
