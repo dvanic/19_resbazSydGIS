@@ -185,3 +185,14 @@ DSM_HARV_df %>%
 
 Notice: this file is a hillshade. We will (not) learn about hillshades in the Working with Multi-band Rasters in R episode.
 
+## Summary!
+
+1. The GeoTIFF file format includes metadata about the raster data.
+
+2. To plot raster data with the ggplot2 package, we need to convert it to a dataframe.
+
+3. R stores CRS information in the Proj4 format.
+
+4. Be careful when dealing with missing or bad data values.
+
+

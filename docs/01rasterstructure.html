@@ -415,11 +415,11 @@ DSM_HARV</code></pre>
 <pre class="r"><code>summary(DSM_HARV)</code></pre>
 <pre><code>## Warning in .local(object, ...): summary is an estimate based on a sample of 1e+05 cells (4.31% of all cells)</code></pre>
 <pre><code>##         HARV_dsmCrop
-## Min.          305.65
-## 1st Qu.       345.56
-## Median        359.57
-## 3rd Qu.       374.22
-## Max.          414.86
+## Min.          305.26
+## 1st Qu.       345.70
+## Median        359.71
+## 3rd Qu.       374.36
+## Max.          415.10
 ## NA&#39;s            0.00</code></pre>
 <p>Note the warning - unless you force R to calculate these statistics using every cell in the raster, it will take a random sample of 100,000 cells and calculate from that instead. To force calculation on more, or even all values, you can use the parameter maxsamp:</p>
 <pre class="r"><code>summary(DSM_HARV, maxsamp = ncell(DSM_HARV))</code></pre>
@@ -536,6 +536,15 @@ crs(DSM_HARV)</code></pre>
 </ol>
 <p>Notice: this file is a hillshade. We will (not) learn about hillshades in the Working with Multi-band Rasters in R episode.</p>
 </div>
+</div>
+<div id="summary" class="section level2">
+<h2>Summary!</h2>
+<ol style="list-style-type: decimal">
+<li><p>The GeoTIFF file format includes metadata about the raster data.</p></li>
+<li><p>To plot raster data with the ggplot2 package, we need to convert it to a dataframe.</p></li>
+<li><p>R stores CRS information in the Proj4 format.</p></li>
+<li><p>Be careful when dealing with missing or bad data values.</p></li>
+</ol>
 </div>
 
 
