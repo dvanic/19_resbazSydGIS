@@ -2,8 +2,23 @@
 # 01 Raster structure --------
 ## Challenge 1
 # Challenge: What units are our data in?
+#
+#
 ## Challenge 2
 # Challenge: Use the output from the GDALinfo() function to find out what NoDataValue is used for our DSM_HARV dataset.
+#
+#
+# Challenge 3
+#Use GDALinfo() to determine the following about the NEON-DS-Airborne-Remote-Sensing/HARV/DSM/HARV_DSMhill.tif file:
+# 1.Does this file have the same CRS as DSM_HARV?
+# 2. What is the NoDataValue?
+# 3. hat is resolution of the raster data?
+# 4. How large would a 5x5 pixel area be on the Earth’s surface?
+# 5. Is the file a multi- or single-band raster?
+#
+#
+#
+
 
 
 # 03 Reproject Rasters in R ---------
