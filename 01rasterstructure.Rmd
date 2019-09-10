@@ -82,7 +82,17 @@ str(DSM_HARV_df)
 
 Let's use ggplot to plot the raster. 
 
-We will set the color scale to scale_fill_viridis_c which is a color-blindness friendly color scale. We will also use the coord_quickmap() function to use an approximate Mercator projection for our plots. This approximation is suitable for small areas that are not too close to the poles. Other coordinate systems are available in ggplot2 if needed, you can learn about them at their help page ?coord_map. (DEMO this here)
+We will set the color scale to scale_fill_viridis_c which is a color-blindness friendly color scale. 
+
+#### Note: The advantages of viridis palette: 
+
+1. A continuous blue to yellow scale that renders detail much more clearly than other palettes
+2. Visible to those with color blindness.
+3. Translates readily to a well-differentiated grey-scale.
+
+
+
+We will also use the coord_quickmap() function to use an approximate Mercator projection for our plots. This approximation is suitable for small areas that are not too close to the poles. Other coordinate systems are available in ggplot2 if needed, you can learn about them at their help page ?coord_map. (DEMO ?coord_map here)
 
 ```{r DemoGG}
 DSM_HARV_df %>%

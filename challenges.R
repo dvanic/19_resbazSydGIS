@@ -18,7 +18,30 @@
 #
 #
 #
-
+#
+#
+#
+# 02 Raster plot -----------------
+# Challenge 4
+# Create a plot of the Harvard Forest Digital Surface Model (DSM) that has:
+# 1. Six classified ranges of values (break points) that are evenly divided among the range of pixel values.
+# 2. Axis labels.
+# 3. A plot title.
+#
+#
+#
+#
+# Challenge 5
+# Create DTM & DSM for SJER (SKIP IF LOW ON TIME)
+# 1. Use the files in the NEON_RemoteSensing/SJER/ directory to create a Digital Terrain 
+# 2. Model map and Digital Surface Model map of the San Joaquin Experimental Range field site.
+# 3. Make sure to:
+# 
+# - include hillshade in the maps,
+# - label axes on the DSM map and exclude them from the DTM map,
+# - include a title for each map,
+# - experiment with various alpha values and color palettes to represent the data.
+# 
 
 
 # 03 Reproject Rasters in R ---------

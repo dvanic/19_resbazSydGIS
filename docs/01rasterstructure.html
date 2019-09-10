@@ -415,11 +415,11 @@ DSM_HARV</code></pre>
 <pre class="r"><code>summary(DSM_HARV)</code></pre>
 <pre><code>## Warning in .local(object, ...): summary is an estimate based on a sample of 1e+05 cells (4.31% of all cells)</code></pre>
 <pre><code>##         HARV_dsmCrop
-## Min.          305.26
-## 1st Qu.       345.70
+## Min.          305.33
+## 1st Qu.       345.64
 ## Median        359.71
-## 3rd Qu.       374.36
-## Max.          415.10
+## 3rd Qu.       374.31
+## Max.          415.77
 ## NA&#39;s            0.00</code></pre>
 <p>Note the warning - unless you force R to calculate these statistics using every cell in the raster, it will take a random sample of 100,000 cells and calculate from that instead. To force calculation on more, or even all values, you can use the parameter maxsamp:</p>
 <pre class="r"><code>summary(DSM_HARV, maxsamp = ncell(DSM_HARV))</code></pre>
@@ -439,12 +439,21 @@ DSM_HARV</code></pre>
 ##  $ y           : num  4713838 4713838 4713838 4713838 4713838 ...
 ##  $ HARV_dsmCrop: num  409 408 407 407 409 ...</code></pre>
 <p>Let’s use ggplot to plot the raster.</p>
-<p>We will set the color scale to scale_fill_viridis_c which is a color-blindness friendly color scale. We will also use the coord_quickmap() function to use an approximate Mercator projection for our plots. This approximation is suitable for small areas that are not too close to the poles. Other coordinate systems are available in ggplot2 if needed, you can learn about them at their help page ?coord_map. (DEMO this here)</p>
+<p>We will set the color scale to scale_fill_viridis_c which is a color-blindness friendly color scale.</p>
+<div id="note-the-advantages-of-viridis-palette" class="section level4">
+<h4>Note: The advantages of viridis palette:</h4>
+<ol style="list-style-type: decimal">
+<li>A continuous blue to yellow scale that renders detail much more clearly than other palettes</li>
+<li>Visible to those with color blindness.</li>
+<li>Translates readily to a well-differentiated grey-scale.</li>
+</ol>
+<p>We will also use the coord_quickmap() function to use an approximate Mercator projection for our plots. This approximation is suitable for small areas that are not too close to the poles. Other coordinate systems are available in ggplot2 if needed, you can learn about them at their help page ?coord_map. (DEMO ?coord_map here)</p>
 <pre class="r"><code>DSM_HARV_df %&gt;%
   ggplot() +
   geom_raster(aes(x = x, y = y, fill = HARV_dsmCrop)) +   scale_fill_viridis_c() +
   coord_quickmap()</code></pre>
 <p><img src="01rasterstructure_files/figure-html/DemoGG-1.png" width="672" /></p>
+</div>
 </div>
 <div id="view-raster-coordinate-reference-system-crs-in-r" class="section level3">
 <h3>View Raster Coordinate Reference System (CRS) in R:</h3>
