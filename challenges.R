@@ -1,4 +1,9 @@
 # This is the file for the challenges
+# 01 Raster structure --------
+## Challenge 1
+# Challenge: What units are our data in?
+
+
 
 # 03 Reproject Rasters in R ---------
 ## Challenge 1
