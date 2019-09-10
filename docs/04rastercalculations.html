@@ -69,7 +69,9 @@ h6 {
 </style>
 
 
+</head>
 
+<body>
 
 <style type = "text/css">
 .main-container {
@@ -94,9 +96,6 @@ img {
 button.code-folding-btn:focus {
   outline: none;
 }
-summary {
-  display: list-item;
-}
 </style>
 
 
@@ -111,6 +110,7 @@ body {
   padding-top: 56px;
   margin-top: -56px;
 }
+
 .section h2 {
   padding-top: 56px;
   margin-top: -56px;
@@ -130,43 +130,6 @@ body {
 .section h6 {
   padding-top: 56px;
   margin-top: -56px;
-}
-.dropdown-submenu {
-  position: relative;
-}
-.dropdown-submenu>.dropdown-menu {
-  top: 0;
-  left: 100%;
-  margin-top: -6px;
-  margin-left: -1px;
-  border-radius: 0 6px 6px 6px;
-}
-.dropdown-submenu:hover>.dropdown-menu {
-  display: block;
-}
-.dropdown-submenu>a:after {
-  display: block;
-  content: " ";
-  float: right;
-  width: 0;
-  height: 0;
-  border-color: transparent;
-  border-style: solid;
-  border-width: 5px 0 5px 5px;
-  border-left-color: #cccccc;
-  margin-top: 5px;
-  margin-right: -10px;
-}
-.dropdown-submenu:hover>a:after {
-  border-left-color: #ffffff;
-}
-.dropdown-submenu.pull-left {
-  float: none;
-}
-.dropdown-submenu.pull-left>.dropdown-menu {
-  left: -100%;
-  margin-left: 10px;
-  border-radius: 6px 0 6px 6px;
 }
 </style>
 
@@ -188,85 +151,19 @@ $(document).ready(function () {
 });
 </script>
 
+
+<div class="container-fluid main-container">
+
 <!-- tabsets -->
-
-<style type="text/css">
-.tabset-dropdown > .nav-tabs {
-  display: inline-table;
-  max-height: 500px;
-  min-height: 44px;
-  overflow-y: auto;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-
-.tabset-dropdown > .nav-tabs > li.active:before {
-  content: "";
-  font-family: 'Glyphicons Halflings';
-  display: inline-block;
-  padding: 10px;
-  border-right: 1px solid #ddd;
-}
-
-.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
-  content: "&#xe258;";
-  border: none;
-}
-
-.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
-  content: "";
-  font-family: 'Glyphicons Halflings';
-  display: inline-block;
-  padding: 10px;
-  border-right: 1px solid #ddd;
-}
-
-.tabset-dropdown > .nav-tabs > li.active {
-  display: block;
-}
-
-.tabset-dropdown > .nav-tabs > li > a,
-.tabset-dropdown > .nav-tabs > li > a:focus,
-.tabset-dropdown > .nav-tabs > li > a:hover {
-  border: none;
-  display: inline-block;
-  border-radius: 4px;
-}
-
-.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
-  display: block;
-  float: none;
-}
-
-.tabset-dropdown > .nav-tabs > li {
-  display: none;
-}
-</style>
-
 <script>
 $(document).ready(function () {
   window.buildTabsets("TOC");
-});
-
-$(document).ready(function () {
-  $('.tabset-dropdown > .nav-tabs > li').click(function () {
-    $(this).parent().toggleClass('nav-tabs-open')
-  });
 });
 </script>
 
 <!-- code folding -->
 
 
-
-
-</head>
-
-<body>
-
-
-<div class="container-fluid main-container">
 
 
 
@@ -320,9 +217,328 @@ $(document).ready(function () {
 </div>
 
 
-<div id="raster-structure" class="section level3">
-<h3>Raster structure</h3>
-<p>Notes on raster structure</p>
+<div id="raster-calculations" class="section level3">
+<h3>Raster Calculations</h3>
+</div>
+<div id="initial-setup-and-definitions" class="section level1">
+<h1>Initial setup and definitions</h1>
+<p>In this lesson we will learn how to calculate a third raster object based on two rasters.</p>
+<p><strong>DSM:</strong> Digital surface model. This represents the elevation of the highest point (including objects on the surface) on the surface. This means the elevation of the tops of trees and shrubs and other vegetation on the surface, if it exists.</p>
+<p><strong>DTM:</strong>: Digital Terrain Model. This is just the elevation of the terrain (surface) without the vegetation.</p>
+<p>Using these two we will try and calculate the <strong>Canopy Height Model:</strong> This is the height of the vegetation corrected for the elevation of the terrain. I.e. <strong>DSM</strong> - <strong>DTM</strong>.</p>
+<div id="challenge-1" class="section level2">
+<h2>Challenge 1</h2>
+<p>Use GDALinfo() fucntion to view information about the DTM and DSM data files. Do the two rasters have the same or different CRSs and resolutions? DO they both have defined minimum and maximum values?</p>
+<p>Load rgdal and raster libraries if not already loaded</p>
+<pre class="r"><code>library(rgdal)</code></pre>
+<pre><code>## Loading required package: sp</code></pre>
+<pre><code>## rgdal: version: 1.4-3, (SVN revision 828)
+##  Geospatial Data Abstraction Library extensions to R successfully loaded
+##  Loaded GDAL runtime: GDAL 2.2.2, released 2017/09/15
+##  Path to GDAL shared files: /usr/share/gdal/2.2
+##  GDAL binary built with GEOS: TRUE 
+##  Loaded PROJ.4 runtime: Rel. 4.9.2, 08 September 2015, [PJ_VERSION: 492]
+##  Path to PROJ.4 shared files: (autodetected)
+##  Linking to sp version: 1.2-7</code></pre>
+<pre class="r"><code>library(raster)</code></pre>
+<pre class="r"><code>GDALinfo(&quot;data/NEON-DS-Airborne-Remote-Sensing/HARV/DSM/HARV_dsmCrop.tif&quot;)</code></pre>
+<pre><code>## rows        1367 
+## columns     1697 
+## bands       1 
+## lower left origin.x        731453 
+## lower left origin.y        4712471 
+## res.x       1 
+## res.y       1 
+## ysign       -1 
+## oblique.x   0 
+## oblique.y   0 
+## driver      GTiff 
+## projection  +proj=utm +zone=18 +datum=WGS84 +units=m +no_defs 
+## file        data/NEON-DS-Airborne-Remote-Sensing/HARV/DSM/HARV_dsmCrop.tif 
+## apparent band summary:
+##    GDType hasNoDataValue NoDataValue blockSize1 blockSize2
+## 1 Float64           TRUE       -9999          1       1697
+## apparent band statistics:
+##     Bmin   Bmax    Bmean      Bsd
+## 1 305.07 416.07 359.8531 17.83169
+## Metadata:
+## AREA_OR_POINT=Area</code></pre>
+<pre class="r"><code>GDALinfo(&quot;data/NEON-DS-Airborne-Remote-Sensing/HARV/DTM/HARV_dtmCrop.tif&quot;)</code></pre>
+<pre><code>## rows        1367 
+## columns     1697 
+## bands       1 
+## lower left origin.x        731453 
+## lower left origin.y        4712471 
+## res.x       1 
+## res.y       1 
+## ysign       -1 
+## oblique.x   0 
+## oblique.y   0 
+## driver      GTiff 
+## projection  +proj=utm +zone=18 +datum=WGS84 +units=m +no_defs 
+## file        data/NEON-DS-Airborne-Remote-Sensing/HARV/DTM/HARV_dtmCrop.tif 
+## apparent band summary:
+##    GDType hasNoDataValue NoDataValue blockSize1 blockSize2
+## 1 Float64           TRUE       -9999          1       1697
+## apparent band statistics:
+##     Bmin   Bmax    Bmean      Bsd
+## 1 304.56 389.82 344.8979 15.86147
+## Metadata:
+## AREA_OR_POINT=Area</code></pre>
+<p><em>Yes they both have the same CRS and res and both have min and max values</em></p>
+<p>If you haven’t already done so, load rasters and convert into data.frames</p>
+<pre class="r"><code>DSM_HARV &lt;- raster(&quot;data/NEON-DS-Airborne-Remote-Sensing/HARV/DSM/HARV_dsmCrop.tif&quot;)
+DTM_HARV &lt;- raster(&quot;data/NEON-DS-Airborne-Remote-Sensing/HARV/DTM/HARV_dtmCrop.tif&quot;)
+
+# Convert into dfs
+DSM_HARV_df &lt;- as.data.frame(DSM_HARV, xy = TRUE)
+DTM_HARV_df &lt;- as.data.frame(DTM_HARV, xy = TRUE)</code></pre>
+<p>Do quick plots to view the raster/dfs</p>
+<p>Load ggplot if haven’t done so.</p>
+<pre class="r"><code>library(ggplot2)</code></pre>
+<pre class="r"><code># DSM_HARV
+
+# raster plot
+plot(DSM_HARV)</code></pre>
+<p><img src="04rastercalculations_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<pre class="r"><code># ggplot
+ggplot() +
+  geom_raster(data = DSM_HARV_df, aes(x = x, y = y, fill = HARV_dsmCrop)) +
+  scale_fill_gradientn(name = &quot;Elevation&quot;, colours = terrain.colors(10)) +
+  coord_quickmap()</code></pre>
+<p><img src="04rastercalculations_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
+<pre class="r"><code># DTM_HARV
+# ggplot
+ggplot() +
+  geom_raster(data = DTM_HARV_df, aes(x = x, y = y, fill = HARV_dtmCrop)) +
+  scale_fill_gradientn(name = &quot;Elevation&quot;, colours = terrain.colors(10)) +
+  coord_quickmap()</code></pre>
+<p><img src="04rastercalculations_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+</div>
+</div>
+<div id="raster-calculations-1" class="section level1">
+<h1>Raster Calculations</h1>
+<ul>
+<li>Most of the times we can just use raster math. You can add, sub, divide, mulitple, log, exp etc. rasters directly.</li>
+<li>For more complex calculations or large rasters, we can use the much more efficient overlay function</li>
+</ul>
+<div id="raster-math" class="section level2">
+<h2>Raster Math</h2>
+<p>We will subtract DTM from DSM</p>
+<pre class="r"><code>CHM_HARV &lt;- DSM_HARV - DTM_HARV
+
+# Convert to df
+CHM_HARV_df &lt;- as.data.frame(CHM_HARV, xy = TRUE)
+str(CHM_HARV_df)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    2319799 obs. of  3 variables:
+##  $ x    : num  731454 731454 731456 731456 731458 ...
+##  $ y    : num  4713838 4713838 4713838 4713838 4713838 ...
+##  $ layer: num  19.4 18.7 17.1 17.2 19.7 ...</code></pre>
+<p>Plot using ggplot</p>
+<pre class="r"><code>ggplot() +
+  geom_raster(data = CHM_HARV_df, aes(x = x, y = y, fill = layer)) + 
+  scale_fill_gradientn(name = &quot;Canopy Height&quot;, colours = terrain.colors(10)) +
+  coord_quickmap()</code></pre>
+<p><img src="04rastercalculations_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p>Distribution of canopy heights</p>
+<pre class="r"><code>ggplot() +
+  geom_histogram(data = CHM_HARV_df, aes(layer))</code></pre>
+<pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<pre><code>## Warning: Removed 1 rows containing non-finite values (stat_bin).</code></pre>
+<p><img src="04rastercalculations_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p>Does the above distribution make sense?</p>
+<div id="challenge-2" class="section level3">
+<h3>Challenge 2</h3>
+<p>It’s often a good idea to explore the range of values in a raster dataset just like we might explore a dataset that we collected in the field.</p>
+<ol style="list-style-type: decimal">
+<li>What is the min and maximum value for the Harvard Forest Canopy Height Model (CHM_HARV) that we just created?</li>
+<li>What are two ways you can check this range of data for CHM_HARV?</li>
+<li>Plot a histogram with 6 bins instead of the default and change the color of the histogram.</li>
+<li>Plot the CHM_HARV raster using breaks that make sense for the data. Include an appropriate color palette for the data, plot title and no axes ticks / labels.</li>
+</ol>
+<pre class="r"><code>CHM_HARV</code></pre>
+<pre><code>## class       : RasterLayer 
+## dimensions  : 1367, 1697, 2319799  (nrow, ncol, ncell)
+## resolution  : 1, 1  (x, y)
+## extent      : 731453, 733150, 4712471, 4713838  (xmin, xmax, ymin, ymax)
+## coord. ref. : +proj=utm +zone=18 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0 
+## data source : in memory
+## names       : layer 
+## values      : 0, 38.16998  (min, max)</code></pre>
+<ol style="list-style-type: decimal">
+<li>min: 0 max: 38.17</li>
+<li>print raster object, use min() and max() functions (don’t forget na.rm argument), create histogram</li>
+<li></li>
+</ol>
+<pre class="r"><code>ggplot() + 
+  geom_histogram(data = CHM_HARV_df, aes(layer),
+                 bins = 6, colour = &quot;black&quot;, 
+                 fill = &quot;darkgreen&quot;)</code></pre>
+<pre><code>## Warning: Removed 1 rows containing non-finite values (stat_bin).</code></pre>
+<p><img src="04rastercalculations_files/figure-html/unnamed-chunk-11-1.png" width="672" /> 4. Load dplyr library</p>
+<pre class="r"><code>library(dplyr)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;dplyr&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:raster&#39;:
+## 
+##     intersect, select, union</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     filter, lag</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     intersect, setdiff, setequal, union</code></pre>
+<pre class="r"><code>custom_bins &lt;- c(0, 10, 20, 30, 40)
+CHM_HARV_df &lt;- CHM_HARV_df %&gt;% mutate(canopy_discrete = cut(layer, breaks = custom_bins))</code></pre>
+<pre><code>## Warning: The `printer` argument is deprecated as of rlang 0.3.0.
+## This warning is displayed once per session.</code></pre>
+<pre class="r"><code># plot
+ggplot() +
+  geom_raster(data = CHM_HARV_df, aes(x = x, y = y, fill = canopy_discrete)) + 
+  scale_fill_manual(name = &quot;Canopy Height (m)&quot;, values = terrain.colors(length(custom_bins)-1)) +
+  ggtitle(&quot;Harvard Forrest Canopy Height&quot;) + 
+  theme(axis.text = element_blank(), axis.ticks = element_blank(), axis.title = element_blank()) + 
+  coord_quickmap()</code></pre>
+<pre><code>## Warning: Removed 51136 rows containing missing values (geom_raster).</code></pre>
+<p><img src="04rastercalculations_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+</div>
+</div>
+<div id="raster-calculations-overlay-function" class="section level2">
+<h2>Raster calculations Overlay function</h2>
+<p>We use the overlay function when:</p>
+<ol style="list-style-type: decimal">
+<li>calculation are complex.</li>
+<li>rasters are large! thus slowing computation times.</li>
+<li>rasters are stored as individual files. Often because they are too large to read in a store in memory.</li>
+</ol>
+<p><strong>Note:</strong> If using RasterStacks or RasterBricks, use calc() instead of overlay().</p>
+<pre class="r"><code>CHM_ov_HARV &lt;- overlay(DSM_HARV,
+                       DTM_HARV,
+                       fun = function(r1, r2) {
+                         return(r1 - r2)
+                       })</code></pre>
+<p>Convert to df for plotting</p>
+<pre class="r"><code>CHM_ov_HARV_df &lt;- as.data.frame(CHM_ov_HARV, xy = TRUE)
+str(CHM_ov_HARV_df)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    2319799 obs. of  3 variables:
+##  $ x    : num  731454 731454 731456 731456 731458 ...
+##  $ y    : num  4713838 4713838 4713838 4713838 4713838 ...
+##  $ layer: num  19.4 18.7 17.1 17.2 19.7 ...</code></pre>
+<p>Now the plot</p>
+<pre class="r"><code>ggplot() +
+  geom_raster(data = CHM_ov_HARV_df, aes(x = x, y = y, fill = layer)) + 
+  scale_fill_gradientn(name = &quot;Canopy Height&quot;, colours = terrain.colors(10)) +
+  coord_quickmap()</code></pre>
+<p><img src="04rastercalculations_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<p>Compare the two plots from the two different raster calculation methods. They should be identical.</p>
+</div>
+<div id="export-rasters-as-geotiffs" class="section level2">
+<h2>Export rasters as GeoTIFFs</h2>
+<p>Done using writeRaster() function.</p>
+<p>Specify format with format argument (GTiff for us), overwrite argument tells R to overwrite if file exists, and no data values can be specified with NAflag argument (-9999). -9999 is the National Ecology Observation Network’s (NEON) standard NoDataValue.</p>
+<pre class="r"><code>writeRaster(CHM_ov_HARV,
+            &quot;data/NEON-DS-Airborne-Remote-Sensing/HARV/CHM/CHM_HARV.tiff&quot;,
+            format = &quot;GTiff&quot;,
+            overwrite = TRUE,
+            NAflag = -9999)</code></pre>
+<div id="challenge-3" class="section level3">
+<h3>Challenge 3</h3>
+<p>Data are often more interesting and powerful when we compare them across various locations. Let’s compare some data collected over Harvard Forest to data collected in Southern California. The NEON San Joaquin Experimental Range (SJER) field site located in Southern California has a very different ecosystem and climate than the NEON Harvard Forest Field Site in Massachusetts.</p>
+<p>Import the SJER DSM and DTM raster files and create a Canopy Height Model. Then compare the two sites. Be sure to name your R objects and outputs carefully, as follows: objectType_SJER (e.g. DSM_SJER). This will help you keep track of data from different sites!</p>
+<ol style="list-style-type: decimal">
+<li>You should have the DSM and DTM data for the SJER site already loaded from the Plot Raster Data in R episode.) Don’t forget to check the CRSs and units of the data.</li>
+</ol>
+<pre class="r"><code>DSM_SJER &lt;- raster(&quot;data/NEON-DS-Airborne-Remote-Sensing/SJER/DSM/SJER_dsmCrop.tif&quot;)
+DTM_SJER &lt;- raster(&quot;data/NEON-DS-Airborne-Remote-Sensing/SJER/DTM/SJER_dtmCrop.tif&quot;)
+
+DSM_SJER</code></pre>
+<pre><code>## class       : RasterLayer 
+## dimensions  : 2178, 2005, 4366890  (nrow, ncol, ncell)
+## resolution  : 1, 1  (x, y)
+## extent      : 255693, 257698, 4109511, 4111689  (xmin, xmax, ymin, ymax)
+## coord. ref. : +proj=utm +zone=11 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0 
+## data source : /home/z3289452/Documents/GIT_REPOS/19_resbazSydGIS/data/NEON-DS-Airborne-Remote-Sensing/SJER/DSM/SJER_dsmCrop.tif 
+## names       : SJER_dsmCrop 
+## values      : 338.96, 510.35  (min, max)</code></pre>
+<pre class="r"><code>DTM_SJER</code></pre>
+<pre><code>## class       : RasterLayer 
+## dimensions  : 2178, 2005, 4366890  (nrow, ncol, ncell)
+## resolution  : 1, 1  (x, y)
+## extent      : 255693, 257698, 4109511, 4111689  (xmin, xmax, ymin, ymax)
+## coord. ref. : +proj=utm +zone=11 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0 
+## data source : /home/z3289452/Documents/GIT_REPOS/19_resbazSydGIS/data/NEON-DS-Airborne-Remote-Sensing/SJER/DTM/SJER_dtmCrop.tif 
+## names       : SJER_dtmCrop 
+## values      : 338.93, 496.31  (min, max)</code></pre>
+<p><em>Res, CRS and units are the same</em></p>
+<ol start="2" style="list-style-type: decimal">
+<li>Create a CHM from the two raster layers and check to make sure the data are what you expect.</li>
+</ol>
+<pre class="r"><code>CHM_SJER &lt;- DSM_SJER - DTM_SJER
+
+CHM_SJER</code></pre>
+<pre><code>## class       : RasterLayer 
+## dimensions  : 2178, 2005, 4366890  (nrow, ncol, ncell)
+## resolution  : 1, 1  (x, y)
+## extent      : 255693, 257698, 4109511, 4111689  (xmin, xmax, ymin, ymax)
+## coord. ref. : +proj=utm +zone=11 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0 
+## data source : /srv/scratch/z3289452/tmp/Rtmp/Rtmp9JY4Yp/raster/r_tmp_2019-09-10_120701_8128_94090.grd 
+## names       : layer 
+## values      : -1.399994, 32.63  (min, max)</code></pre>
+<p>Using the overlay function:</p>
+<pre class="r"><code>CHM_ov_SJER &lt;- overlay(DSM_SJER,
+                       DTM_SJER,
+                       fun = function(r1, r2) {
+                         return(r1 - r2)
+                       })
+
+CHM_ov_SJER</code></pre>
+<pre><code>## class       : RasterLayer 
+## dimensions  : 2178, 2005, 4366890  (nrow, ncol, ncell)
+## resolution  : 1, 1  (x, y)
+## extent      : 255693, 257698, 4109511, 4111689  (xmin, xmax, ymin, ymax)
+## coord. ref. : +proj=utm +zone=11 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0 
+## data source : in memory
+## names       : layer 
+## values      : -1.399994, 32.63  (min, max)</code></pre>
+<p><em>In both cases the min is negative!</em></p>
+<ol start="3" style="list-style-type: decimal">
+<li>Plot the CHM from SJER.</li>
+</ol>
+<pre class="r"><code># Conver to df
+CHM_ov_SJER_df &lt;- as.data.frame(CHM_ov_SJER, xy = TRUE)
+
+ggplot() +
+  geom_raster(data = CHM_ov_SJER_df, aes(x = x, y = y, fill = layer)) + 
+  scale_fill_gradientn(name = &quot;Canopy Height&quot;, colours = terrain.colors(10)) +
+  coord_quickmap()</code></pre>
+<p><img src="04rastercalculations_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
+<ol start="4" style="list-style-type: decimal">
+<li>Export the SJER CHM as a GeoTIFF.</li>
+</ol>
+<pre class="r"><code>system(&quot;mkdir data/NEON-DS-Airborne-Remote-Sensing/SJER/CHM&quot;)
+
+writeRaster(CHM_ov_SJER,
+            &quot;data/NEON-DS-Airborne-Remote-Sensing/SJER/CHM/CHM_SJER.tiff&quot;,
+            format = &quot;GTiff&quot;,
+            overwrite = TRUE,
+            NAflag = -9999)</code></pre>
+<ol start="5" style="list-style-type: decimal">
+<li>Compare the vegetation structure of the Harvard Forest and San Joaquin Experimental Range.</li>
+</ol>
+<pre class="r"><code># we can compare by plotting histograms
+# Harvard forrest
+ggplot() +
+  geom_histogram(data = CHM_HARV_df, aes(layer))</code></pre>
+<pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<pre><code>## Warning: Removed 1 rows containing non-finite values (stat_bin).</code></pre>
+<p><img src="04rastercalculations_files/figure-html/unnamed-chunk-23-1.png" width="672" /></p>
+<pre class="r"><code># San Joaquin Env res.
+ggplot() +
+  geom_histogram(data = CHM_ov_SJER_df, aes(layer))</code></pre>
+<pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
+<p><img src="04rastercalculations_files/figure-html/unnamed-chunk-23-2.png" width="672" /> <em>SJER is a lot more barren and had much shorter vegetation.</em></p>
+</div>
+</div>
 </div>
 
 
