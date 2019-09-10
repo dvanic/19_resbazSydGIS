@@ -1,81 +1,103 @@
 ### Raster structure
 
 Questions:
-What is a raster dataset?
-How do I work with and plot raster data in R?
-How can I handle missing or bad data values for a raster?
+- What is a raster dataset?
+- How do I work with and plot raster data in R?
+- How can I handle missing or bad data values for a raster?
 
 Objectives:
-Describe the fundamental attributes of a raster dataset.
-Explore raster attributes and metadata using R.
-Import rasters into R using the raster package.
-Plot a raster file in R using the ggplot2 package.
-Describe the difference between single- and multi-band rasters.
+- Describe the fundamental attributes of a raster dataset.
+- Explore raster attributes and metadata using R.
+- Import rasters into R using the raster package.
+- Plot a raster file in R using the ggplot2 package.
+- Describe the difference between single- and multi-band rasters.
 
 
-installing the raster and rgdal packages: install.packages("raster"). Note that for raster package you might need to install sp package using install.packages("sp")
-as wel ass install.packages("rgdal")
-```{r}
-library(sp)
+Installing the raster and rgdal packages: install.packages("raster").
+
+Note that for raster package you might need to install sp package using install.packages("sp") as well as install.packages("rgdal")
+
+```{r loadLibraries}
 library(raster)
 library(rgdal)
 library(tidyverse)
+# set the ggplot theme to minimal upfront
+theme_set(theme_minimal())
 ```
 
-First download the data using the link below:
-https://ndownloader.figshare.com/articles/2009586/versions/10
+You should already have the data...
 
-viewing the Raster file attributes
-```{r}
+First, let's view the Raster file attributes
+
+We will be working with a series of GeoTIFF files in this lesson. The GeoTIFF format contains a set of embedded tags with metadata about the raster data. We can use the function GDALinfo() to get information about our raster data before we read that data into R. It is ideal to do this before importing your data.
+
+
+```{r lookAtInto}
 GDALinfo("data/NEON-DS-Airborne-Remote-Sensing/HARV/DSM/HARV_dsmCrop.tif")
 ```
 
-Storing this information in R
-```{r}
+We can store this information in R
+
+```{r CaptureInfo}
 HARV_dsmCrop_info <- capture.output(
   GDALinfo("data/NEON-DS-Airborne-Remote-Sensing/HARV/DSM/HARV_dsmCrop.tif")
 )
 ```
 
-Open a Raster in R
-```{r}
+Each line of text that was printed to the console is now stored as an element of the character vector HARV_dsmCrop_info. We will be exploring this data throughout this episode. By the end of this episode, you will be able to explain and understand the output above.
+
+### Open a Raster in R
+
+```{r OpenRaster}
 DSM_HARV <- 
   raster("data/NEON-DS-Airborne-Remote-Sensing/HARV/DSM/HARV_dsmCrop.tif")
 
 DSM_HARV
 ```
 
-```{r}
+
+```{r Summary}
 summary(DSM_HARV)
 ```
+
+Note the warning - unless you force R to calculate these statistics using every cell in the raster, it will take a random sample of 100,000 cells and calculate from that instead. To force calculation on more, or even all values, you can use the parameter maxsamp:
 
 ```{r}
 summary(DSM_HARV, maxsamp = ncell(DSM_HARV))
 ```
 
-convert it to a dataframe in order to plot it using ggplot2
+Convert it to a dataframe in order to plot it using ggplot2
+
 ```{r}
 DSM_HARV_df <- as.data.frame(DSM_HARV, xy = TRUE)
 ```
 
-can see a standard dataframe format
-```{r}
+Can see a standard dataframe format
+
+```{r LookDF}
 str(DSM_HARV_df)
 ```
 
-Note: in case ggplot is not installed install.packages("ggplot2") or install.packages("ggplot2", dependencies = TRUE), then check the packages to make sure it is ticked
-```{r}
-ggplot() +
-  geom_raster(data = DSM_HARV_df , aes(x = x, y = y, fill = HARV_dsmCrop)) +   scale_fill_viridis_c() +
+Let's use ggplot to plot the raster. 
+
+We will set the color scale to scale_fill_viridis_c which is a color-blindness friendly color scale. We will also use the coord_quickmap() function to use an approximate Mercator projection for our plots. This approximation is suitable for small areas that are not too close to the poles. Other coordinate systems are available in ggplot2 if needed, you can learn about them at their help page ?coord_map. (DEMO this here)
+
+```{r DemoGG}
+DSM_HARV_df %>%
+  ggplot() +
+  geom_raster(aes(x = x, y = y, fill = HARV_dsmCrop)) +   scale_fill_viridis_c() +
   coord_quickmap()
 ```
 
-View Raster Coordinate Reference System (CRS) in R:
-We can view the CRS string associated with our R object using thecrs() function.
+### View Raster Coordinate Reference System (CRS) in R:
+
+We can view the CRS string associated with our R object using the crs() function.
+
 ```{r}
+# Challenge: What units are our data in?
 crs(DSM_HARV)
 ```
-Challenge: What units are our data in?
+
 
 Understanding CRS in Proj4 Format:
 proj=utm: the projection is UTM, UTM has several zones.

@@ -1,28 +1,33 @@
 # This is the file for the challenges
 
-# 03 Reproject Rasters in R
-
+# 03 Reproject Rasters in R ---------
 ## Challenge 1
 ## View the CRS for each of these datasets. What projection does each use?
+#
 ## Challenge 2
 ## Why do you think the two extents differ?
+#
 ## Challenge 3
 ## Create a map of the San Joaquin Experimental Range field site using the SJER_DSMhill_WGS84.tif and SJER_dsmCrop.tif files. 
 ## Reproject the data as necessary to make things line up!
 ## If you completed the San Joaquin plotting challenge in the Plot Raster Data in R episode, 
 ## how does the map you just created compare to that map?
 
-# 04 Raster Calculations
-
+# 04 Raster Calculations --------------
 ## Challenge 1
 ## Use GDALinfo() fucntion to view information about the DTM and DSM data files. Do the two rasters have the same or different
 ## CRSs and resolutions? DO they both have defined minimum and maximum values?
+#
+#
 ## Challenge 2
 ## It’s often a good idea to explore the range of values in a raster dataset just like we might explore a dataset that we collected in the field.
 ## 1. What is the min and maximum value for the Harvard Forest Canopy Height Model (CHM_HARV) that we just created?
 ## 2. What are two ways you can check this range of data for CHM_HARV?
 ## 3. Plot a histogram with 6 bins instead of the default and change the color of the histogram.
 ## 4. Plot the CHM_HARV raster using breaks that make sense for the data. Include an appropriate color palette for the data, plot title and no axes ticks / labels.
+#
+#
+#
 ## Challenge 3
 ## Data are often more interesting and powerful when we compare them across various locations. 
 ## Let’s compare some data collected over Harvard Forest to data collected in Southern California. 
@@ -61,3 +66,10 @@
 # NEON-DS-Site-Layout-Files/US-Boundary-Layers\US-State-Boundaries-Census-2014. 
 # 2. Apply a fill color to each state using its region value. 
 # 3. Add a legend.
+
+# Challenge 4 (RENUMBER LATER!)
+# Create a map of the North Eastern United States as follows:
+# 1. Import and plot Boundary-US-State-NEast.shp. Adjust line width as necessary.
+# 2. Layer the Fisher Tower (in the NEON Harvard Forest site) point location point_HARV onto the plot.
+# 3. Add a title.
+# 4. Add a legend that shows both the state boundary (as a line) and the Tower location point.

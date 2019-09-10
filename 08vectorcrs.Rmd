@@ -83,4 +83,24 @@ st_transform(point_HARV, st_crs(state_boundary_US))
 st_transform(point_HARV, as.character(st_crs(state_boundary_US))[2])
 ```
 
+```{r Challenge4}
+# Create a map of the North Eastern United States as follows:
+# 1. Import and plot Boundary-US-State-NEast.shp. Adjust line width as necessary.
+# 2. Layer the Fisher Tower (in the NEON Harvard Forest site) point location point_HARV onto the plot.
+# 3. Add a title.
+# 4. Add a legend that shows both the state boundary (as a line) and the Tower location point.
+NE.States.Boundary.US <- st_read("data/NEON-DS-Site-Layout-Files/US-Boundary-Layers/Boundary-US-State-NEast.shp")
+
+NE.States.Boundary.US %>% 
+  ggplot() +
+    geom_sf(aes(color ="color"), show.legend = "line") +
+    scale_color_manual(name = "", labels = "State Boundary", values = c("color" = "gray18")) +
+    geom_sf(data = point_HARV_4326, aes(shape = "shape"), color = "purple") +
+    scale_shape_manual(name = "", labels = "Fisher Tower", values = c("shape" = 19)) +
+    ggtitle("Fisher Tower location") +
+    theme(legend.background = element_rect(color = NA)) +
+    coord_sf()
+
+
+```
 
