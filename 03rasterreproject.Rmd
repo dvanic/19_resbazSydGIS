@@ -1,7 +1,17 @@
 ### Reproject Raster
 
+LIFE: How do I work with raster data sets that are in different projections?
+
+Give examples...
+
+
+In the Plot Raster Data in R episode, we learned how to layer a raster file on top of a hillshade for a nice looking basemap. In that episode, all of our data were in the same CRS. What happens when things don’t line up?
+
+
 ## Initial Setup and exploration
+
 **Task:** Import two geoTiffs, investigate ggplot behaviour when plotting them on top of each other. Explain behaviour by comparing projections of the two geoTiffs.
+
 
 
 ```{r loadStuff, echo=F, warning=F, message=F}
@@ -15,6 +25,9 @@ DSM_HARV_df <- as.data.frame(DSM_HARV, xy = TRUE)
 
 ```
 
+For this episode, we will be working with the Harvard Forest Digital Terrain Model data. This differs from the surface model data we’ve been working with so far in that the digital terrain model (DTM) includes the tops of trees, while the digital surface model (DSM) shows the ground level.
+
+
 Import dtmCrop and dtmHill_WGS84 geoTiffs
 ```{r}
 DTM_HARV <- raster("data/NEON-DS-Airborne-Remote-Sensing/HARV/DTM/HARV_dtmCrop.tif")
@@ -24,7 +37,8 @@ DTM_HARV
 DTM_hill_HARV
 ```
 
-Convert rasters into data frames
+Convert rasters into data frames to plot with ggplot
+
 ```{r}
 DTM_HARV_df <- as.data.frame(DTM_HARV, xy = TRUE)
 DTM_hill_HARV_df <- as.data.frame(DTM_hill_HARV, xy = T)
@@ -33,25 +47,21 @@ str(DTM_HARV_df)
 str(DTM_hill_HARV_df)
 ```
 
-Plot both dfs on the same ggplot plot
-
-First import ggplot library
-```{r}
-library(ggplot2)
-```
 
 Plot DTM first
 ```{r}
-ggplot() +
-  geom_raster(data = DTM_HARV_df, aes(x = x, y = y, fill = HARV_dtmCrop)) +
+DTM_HARV_df %>% 
+  ggplot() +
+  geom_raster(aes(x = x, y = y, fill = HARV_dtmCrop)) +
   scale_fill_gradientn(name = "Elevation", colours = terrain.colors(10)) +
   coord_quickmap()
 ```
 
 Now plot hillshade
 ```{r}
-ggplot() + 
-  geom_raster(data = DTM_hill_HARV_df, aes(x = x, y = y, alpha = HARV_DTMhill_WGS84)) +
+DTM_hill_HARV_df %>%
+  ggplot() + 
+  geom_raster(aes(x = x, y = y, alpha = HARV_DTMhill_WGS84)) +
   coord_quickmap()
 ```
 
@@ -65,12 +75,15 @@ ggplot() +
   
 ```
 
-### Exercise
-View the CRS for each of these datasets. What projection does each use?
-```{r}
+
+
+```{r Ch6}
+# Challenge: View the CRS for each of these datasets. What projection does each use?
+
 crs(DTM_HARV)
 crs(DTM_hill_HARV)
 ```
+
 DTM_HARV uses UTM projection in units of m, and DTM_hill_HARV used Geographic WGS84 represented by longitude and latitude values
 
 
@@ -79,6 +92,7 @@ DTM_HARV uses UTM projection in units of m, and DTM_hill_HARV used Geographic WG
 Use the projectRaster() function to project one raster into the same crs as another raster. The CRS of the second raster must be defined. This would of course change the data values as well. 
 
 If the CRS of the second raster is not defined and you know the correct crs, then you can set the crs as follows
+
 ```{r, eval=FALSE}
 crs(DTM_HARV) <- "+proj=utm +zone=18 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0"
 ```
@@ -102,6 +116,7 @@ extent(DTM_hill_HARV)
 Why do you think the two extents differ?
 
 Because the extent for DTM_hill_UTMZ18_HARV is in UTM coordinates in m while the extent for DTM_hill_HARV is in long/lat in decimal degrees.
+
 
 ## Deal with Raster Resolution
 Use the res() function to print resolutions of the original and reprojected hillshade rasters
@@ -142,7 +157,7 @@ ggplot() +
 
 ### Exercise 3
 Create a map of the San Joaquin Experimental Range field site using the SJER_DSMhill_WGS84.tif and SJER_dsmCrop.tif files. Reproject the data as necessary to make things line up!
-```{r}
+```{r ch5, cache=TRUE}
 # import
 DSM_SJER <- raster("data/NEON-DS-Airborne-Remote-Sensing/SJER/DSM/SJER_dsmCrop.tif")
 DSM_hill_SJER <- raster("data/NEON-DS-Airborne-Remote-Sensing/SJER/DSM/SJER_DSMhill_WGS84.tif")

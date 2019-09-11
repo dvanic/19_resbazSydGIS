@@ -4,19 +4,22 @@
 
 In this lesson we will learn how to calculate a third raster object based on two rasters. 
 
-**DSM:** Digital surface model. This represents the elevation of the highest point (including objects on the surface) on the surface. This means the elevation of the tops of trees and shrubs and other vegetation on the surface, if it exists.
+- **DSM:** Digital surface model. This represents the elevation of the highest point (including objects on the surface) on the surface. This means the elevation of the tops of trees and shrubs and other vegetation on the surface, if it exists.
 
-**DTM:**: Digital Terrain Model. This is just the elevation of the terrain (surface) without the vegetation.
+- **DTM:**: Digital Terrain Model. This is just the elevation of the terrain (surface) without the vegetation.
 
 Using these two we will try and calculate the
-**Canopy Height Model:** This is the height of the vegetation corrected for the elevation of the terrain. I.e. **DSM** - **DTM**.
 
-## Challenge 1
-Use GDALinfo() fucntion to view information about the DTM and DSM data files. Do the two rasters have the same or different
-CRSs and resolutions? DO they both have defined minimum and maximum values?
+- **Canopy Height Model:** This is the height of the vegetation corrected for the elevation of the terrain. I.e. **DSM** - **DTM**.
+
+
 
 Load rgdal and raster libraries if not already loaded
 ```{r}
+
+## Challenge 9
+# Use GDALinfo() fucntion to view information about the DTM and DSM data files. Do the two rasters have the same or different CRSs and resolutions? DO they both have defined minimum and maximum values?
+  
 library(rgdal)
 library(raster)
 ```

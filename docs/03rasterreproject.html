@@ -322,10 +322,14 @@ $(document).ready(function () {
 
 <div id="reproject-raster" class="section level3">
 <h3>Reproject Raster</h3>
+<p>LIFE: How do I work with raster data sets that are in different projections?</p>
+<p>Give examples…</p>
+<p>In the Plot Raster Data in R episode, we learned how to layer a raster file on top of a hillshade for a nice looking basemap. In that episode, all of our data were in the same CRS. What happens when things don’t line up?</p>
 </div>
 <div id="initial-setup-and-exploration" class="section level2">
 <h2>Initial Setup and exploration</h2>
 <p><strong>Task:</strong> Import two geoTiffs, investigate ggplot behaviour when plotting them on top of each other. Explain behaviour by comparing projections of the two geoTiffs.</p>
+<p>For this episode, we will be working with the Harvard Forest Digital Terrain Model data. This differs from the surface model data we’ve been working with so far in that the digital terrain model (DTM) includes the tops of trees, while the digital surface model (DSM) shows the ground level.</p>
 <p>Import dtmCrop and dtmHill_WGS84 geoTiffs</p>
 <pre class="r"><code>DTM_HARV &lt;- raster(&quot;data/NEON-DS-Airborne-Remote-Sensing/HARV/DTM/HARV_dtmCrop.tif&quot;)
 DTM_hill_HARV &lt;- raster(&quot;data/NEON-DS-Airborne-Remote-Sensing/HARV/DTM/HARV_DTMhill_WGS84.tif&quot;)
@@ -348,7 +352,7 @@ DTM_HARV</code></pre>
 ## source     : /Users/darya/Dropbox (Sydney Uni)/Training/19_09_11_ResBaz/19_01_11_ResBazGIS/data/NEON-DS-Airborne-Remote-Sensing/HARV/DTM/HARV_DTMhill_WGS84.tif 
 ## names      : HARV_DTMhill_WGS84 
 ## values     : -0.1239408, 0.9957315  (min, max)</code></pre>
-<p>Convert rasters into data frames</p>
+<p>Convert rasters into data frames to plot with ggplot</p>
 <pre class="r"><code>DTM_HARV_df &lt;- as.data.frame(DTM_HARV, xy = TRUE)
 DTM_hill_HARV_df &lt;- as.data.frame(DTM_hill_HARV, xy = T)
 
@@ -362,31 +366,29 @@ str(DTM_HARV_df)</code></pre>
 ##  $ x                 : num  -72.2 -72.2 -72.2 -72.2 -72.2 ...
 ##  $ y                 : num  42.5 42.5 42.5 42.5 42.5 ...
 ##  $ HARV_DTMhill_WGS84: num  NA NA NA NA NA NA NA NA NA NA ...</code></pre>
-<p>Plot both dfs on the same ggplot plot</p>
-<p>First import ggplot library</p>
-<pre class="r"><code>library(ggplot2)</code></pre>
 <p>Plot DTM first</p>
-<pre class="r"><code>ggplot() +
-  geom_raster(data = DTM_HARV_df, aes(x = x, y = y, fill = HARV_dtmCrop)) +
+<pre class="r"><code>DTM_HARV_df %&gt;% 
+  ggplot() +
+  geom_raster(aes(x = x, y = y, fill = HARV_dtmCrop)) +
   scale_fill_gradientn(name = &quot;Elevation&quot;, colours = terrain.colors(10)) +
   coord_quickmap()</code></pre>
-<p><img src="03rasterreproject_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p><img src="03rasterreproject_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
 <p>Now plot hillshade</p>
-<pre class="r"><code>ggplot() + 
-  geom_raster(data = DTM_hill_HARV_df, aes(x = x, y = y, alpha = HARV_DTMhill_WGS84)) +
+<pre class="r"><code>DTM_hill_HARV_df %&gt;%
+  ggplot() + 
+  geom_raster(aes(x = x, y = y, alpha = HARV_DTMhill_WGS84)) +
   coord_quickmap()</code></pre>
-<p><img src="03rasterreproject_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p><img src="03rasterreproject_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 <p>Now lets plot them on top of each other. What will happen?</p>
 <pre class="r"><code>ggplot() +
   geom_raster(data = DTM_hill_HARV_df, aes(x = x, y = y, alpha = HARV_DTMhill_WGS84)) +
   geom_raster(data = DTM_HARV_df, aes(x = x, y = y, fill = HARV_dtmCrop)) +
   scale_fill_gradientn(name = &quot;Elevation&quot;, colours = terrain.colors(10)) +
   coord_quickmap() </code></pre>
-<p><img src="03rasterreproject_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
-<div id="exercise" class="section level3">
-<h3>Exercise</h3>
-<p>View the CRS for each of these datasets. What projection does each use?</p>
-<pre class="r"><code>crs(DTM_HARV)</code></pre>
+<p><img src="03rasterreproject_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<pre class="r"><code># Challenge: View the CRS for each of these datasets. What projection does each use?
+
+crs(DTM_HARV)</code></pre>
 <pre><code>## CRS arguments:
 ##  +proj=utm +zone=18 +datum=WGS84 +units=m +no_defs +ellps=WGS84
 ## +towgs84=0,0,0</code></pre>
@@ -394,7 +396,6 @@ str(DTM_HARV_df)</code></pre>
 <pre><code>## CRS arguments:
 ##  +proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0</code></pre>
 <p>DTM_HARV uses UTM projection in units of m, and DTM_hill_HARV used Geographic WGS84 represented by longitude and latitude values</p>
-</div>
 </div>
 <div id="reproject-rasters" class="section level2">
 <h2>Reproject Rasters</h2>
@@ -425,7 +426,7 @@ crs(DTM_hill_UTMZ18_HARV)</code></pre>
 ## xmax       : -72.16061 
 ## ymin       : 42.52941 
 ## ymax       : 42.54234</code></pre>
-<div id="exercise-1" class="section level3">
+<div id="exercise" class="section level3">
 <h3>Exercise</h3>
 <p>Why do you think the two extents differ?</p>
 <p>Because the extent for DTM_hill_UTMZ18_HARV is in UTM coordinates in m while the extent for DTM_hill_HARV is in long/lat in decimal degrees.</p>
@@ -457,7 +458,7 @@ crs(DTM_hill_UTMZ18_HARV)</code></pre>
   scale_fill_gradientn(name = &quot;Elevation&quot;, colours = terrain.colors(10)) +
   scale_alpha(range = c(0.25, 0.65), guide = &quot;none&quot;) +
   coord_quickmap() </code></pre>
-<p><img src="03rasterreproject_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<p><img src="03rasterreproject_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
 <div id="exercise-3" class="section level3">
 <h3>Exercise 3</h3>
 <p>Create a map of the San Joaquin Experimental Range field site using the SJER_DSMhill_WGS84.tif and SJER_dsmCrop.tif files. Reproject the data as necessary to make things line up!</p>
@@ -498,7 +499,7 @@ ggplot() +
   scale_fill_gradientn(name = &quot;Elevation&quot;, colours = terrain.colors(10)) +
   # scale_alpha(range = c(0.25, 0.65), guide = &quot;none&quot;) +
   coord_quickmap() </code></pre>
-<p><img src="03rasterreproject_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<p><img src="03rasterreproject_files/figure-html/ch5-1.png" width="672" /></p>
 <p>If you completed the San Joaquin plotting challenge in the Plot Raster Data in R episode, how does the map you just created compare to that map?</p>
 <p><em>The map looks identical which is expected</em></p>
 </div>

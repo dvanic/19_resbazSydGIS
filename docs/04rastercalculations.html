@@ -69,9 +69,7 @@ h6 {
 </style>
 
 
-</head>
 
-<body>
 
 <style type = "text/css">
 .main-container {
@@ -96,6 +94,9 @@ img {
 button.code-folding-btn:focus {
   outline: none;
 }
+summary {
+  display: list-item;
+}
 </style>
 
 
@@ -110,7 +111,6 @@ body {
   padding-top: 56px;
   margin-top: -56px;
 }
-
 .section h2 {
   padding-top: 56px;
   margin-top: -56px;
@@ -130,6 +130,43 @@ body {
 .section h6 {
   padding-top: 56px;
   margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
 }
 </style>
 
@@ -151,19 +188,85 @@ $(document).ready(function () {
 });
 </script>
 
-
-<div class="container-fluid main-container">
-
 <!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
 <script>
 $(document).ready(function () {
   window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
 });
 </script>
 
 <!-- code folding -->
 
 
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
 
 
 
@@ -223,23 +326,28 @@ $(document).ready(function () {
 <div id="initial-setup-and-definitions" class="section level1">
 <h1>Initial setup and definitions</h1>
 <p>In this lesson we will learn how to calculate a third raster object based on two rasters.</p>
-<p><strong>DSM:</strong> Digital surface model. This represents the elevation of the highest point (including objects on the surface) on the surface. This means the elevation of the tops of trees and shrubs and other vegetation on the surface, if it exists.</p>
-<p><strong>DTM:</strong>: Digital Terrain Model. This is just the elevation of the terrain (surface) without the vegetation.</p>
-<p>Using these two we will try and calculate the <strong>Canopy Height Model:</strong> This is the height of the vegetation corrected for the elevation of the terrain. I.e. <strong>DSM</strong> - <strong>DTM</strong>.</p>
-<div id="challenge-1" class="section level2">
-<h2>Challenge 1</h2>
-<p>Use GDALinfo() fucntion to view information about the DTM and DSM data files. Do the two rasters have the same or different CRSs and resolutions? DO they both have defined minimum and maximum values?</p>
+<ul>
+<li><p><strong>DSM:</strong> Digital surface model. This represents the elevation of the highest point (including objects on the surface) on the surface. This means the elevation of the tops of trees and shrubs and other vegetation on the surface, if it exists.</p></li>
+<li><p><strong>DTM:</strong>: Digital Terrain Model. This is just the elevation of the terrain (surface) without the vegetation.</p></li>
+</ul>
+<p>Using these two we will try and calculate the</p>
+<ul>
+<li><strong>Canopy Height Model:</strong> This is the height of the vegetation corrected for the elevation of the terrain. I.e. <strong>DSM</strong> - <strong>DTM</strong>.</li>
+</ul>
 <p>Load rgdal and raster libraries if not already loaded</p>
-<pre class="r"><code>library(rgdal)</code></pre>
+<pre class="r"><code>## Challenge 9
+# Use GDALinfo() fucntion to view information about the DTM and DSM data files. Do the two rasters have the same or different CRSs and resolutions? DO they both have defined minimum and maximum values?
+  
+library(rgdal)</code></pre>
 <pre><code>## Loading required package: sp</code></pre>
-<pre><code>## rgdal: version: 1.4-3, (SVN revision 828)
+<pre><code>## rgdal: version: 1.4-4, (SVN revision 833)
 ##  Geospatial Data Abstraction Library extensions to R successfully loaded
-##  Loaded GDAL runtime: GDAL 2.2.2, released 2017/09/15
-##  Path to GDAL shared files: /usr/share/gdal/2.2
-##  GDAL binary built with GEOS: TRUE 
-##  Loaded PROJ.4 runtime: Rel. 4.9.2, 08 September 2015, [PJ_VERSION: 492]
-##  Path to PROJ.4 shared files: (autodetected)
-##  Linking to sp version: 1.2-7</code></pre>
+##  Loaded GDAL runtime: GDAL 2.1.3, released 2017/20/01
+##  Path to GDAL shared files: /Library/Frameworks/R.framework/Versions/3.6/Resources/library/rgdal/gdal
+##  GDAL binary built with GEOS: FALSE 
+##  Loaded PROJ.4 runtime: Rel. 4.9.3, 15 August 2016, [PJ_VERSION: 493]
+##  Path to PROJ.4 shared files: /Library/Frameworks/R.framework/Versions/3.6/Resources/library/rgdal/proj
+##  Linking to sp version: 1.3-1</code></pre>
 <pre class="r"><code>library(raster)</code></pre>
 <pre class="r"><code>GDALinfo(&quot;data/NEON-DS-Airborne-Remote-Sensing/HARV/DSM/HARV_dsmCrop.tif&quot;)</code></pre>
 <pre><code>## rows        1367 
@@ -296,6 +404,11 @@ DTM_HARV_df &lt;- as.data.frame(DTM_HARV, xy = TRUE)</code></pre>
 <p>Do quick plots to view the raster/dfs</p>
 <p>Load ggplot if haven’t done so.</p>
 <pre class="r"><code>library(ggplot2)</code></pre>
+<pre><code>## Registered S3 methods overwritten by &#39;ggplot2&#39;:
+##   method         from 
+##   [.quosures     rlang
+##   c.quosures     rlang
+##   print.quosures rlang</code></pre>
 <pre class="r"><code># DSM_HARV
 
 # raster plot
@@ -314,7 +427,6 @@ ggplot() +
   scale_fill_gradientn(name = &quot;Elevation&quot;, colours = terrain.colors(10)) +
   coord_quickmap()</code></pre>
 <p><img src="04rastercalculations_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
-</div>
 </div>
 <div id="raster-calculations-1" class="section level1">
 <h1>Raster Calculations</h1>
@@ -357,14 +469,14 @@ str(CHM_HARV_df)</code></pre>
 <li>Plot the CHM_HARV raster using breaks that make sense for the data. Include an appropriate color palette for the data, plot title and no axes ticks / labels.</li>
 </ol>
 <pre class="r"><code>CHM_HARV</code></pre>
-<pre><code>## class       : RasterLayer 
-## dimensions  : 1367, 1697, 2319799  (nrow, ncol, ncell)
-## resolution  : 1, 1  (x, y)
-## extent      : 731453, 733150, 4712471, 4713838  (xmin, xmax, ymin, ymax)
-## coord. ref. : +proj=utm +zone=18 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0 
-## data source : in memory
-## names       : layer 
-## values      : 0, 38.16998  (min, max)</code></pre>
+<pre><code>## class      : RasterLayer 
+## dimensions : 1367, 1697, 2319799  (nrow, ncol, ncell)
+## resolution : 1, 1  (x, y)
+## extent     : 731453, 733150, 4712471, 4713838  (xmin, xmax, ymin, ymax)
+## crs        : +proj=utm +zone=18 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0 
+## source     : memory
+## names      : layer 
+## values     : 0, 38.16998  (min, max)</code></pre>
 <ol style="list-style-type: decimal">
 <li>min: 0 max: 38.17</li>
 <li>print raster object, use min() and max() functions (don’t forget na.rm argument), create histogram</li>
@@ -389,10 +501,9 @@ str(CHM_HARV_df)</code></pre>
 ## 
 ##     intersect, setdiff, setequal, union</code></pre>
 <pre class="r"><code>custom_bins &lt;- c(0, 10, 20, 30, 40)
-CHM_HARV_df &lt;- CHM_HARV_df %&gt;% mutate(canopy_discrete = cut(layer, breaks = custom_bins))</code></pre>
-<pre><code>## Warning: The `printer` argument is deprecated as of rlang 0.3.0.
-## This warning is displayed once per session.</code></pre>
-<pre class="r"><code># plot
+CHM_HARV_df &lt;- CHM_HARV_df %&gt;% mutate(canopy_discrete = cut(layer, breaks = custom_bins))
+
+# plot
 ggplot() +
   geom_raster(data = CHM_HARV_df, aes(x = x, y = y, fill = canopy_discrete)) + 
   scale_fill_manual(name = &quot;Canopy Height (m)&quot;, values = terrain.colors(length(custom_bins)-1)) +
@@ -452,23 +563,23 @@ str(CHM_ov_HARV_df)</code></pre>
 DTM_SJER &lt;- raster(&quot;data/NEON-DS-Airborne-Remote-Sensing/SJER/DTM/SJER_dtmCrop.tif&quot;)
 
 DSM_SJER</code></pre>
-<pre><code>## class       : RasterLayer 
-## dimensions  : 2178, 2005, 4366890  (nrow, ncol, ncell)
-## resolution  : 1, 1  (x, y)
-## extent      : 255693, 257698, 4109511, 4111689  (xmin, xmax, ymin, ymax)
-## coord. ref. : +proj=utm +zone=11 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0 
-## data source : /home/z3289452/Documents/GIT_REPOS/19_resbazSydGIS/data/NEON-DS-Airborne-Remote-Sensing/SJER/DSM/SJER_dsmCrop.tif 
-## names       : SJER_dsmCrop 
-## values      : 338.96, 510.35  (min, max)</code></pre>
+<pre><code>## class      : RasterLayer 
+## dimensions : 2178, 2005, 4366890  (nrow, ncol, ncell)
+## resolution : 1, 1  (x, y)
+## extent     : 255693, 257698, 4109511, 4111689  (xmin, xmax, ymin, ymax)
+## crs        : +proj=utm +zone=11 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0 
+## source     : /Users/darya/Dropbox (Sydney Uni)/Training/19_09_11_ResBaz/19_01_11_ResBazGIS/data/NEON-DS-Airborne-Remote-Sensing/SJER/DSM/SJER_dsmCrop.tif 
+## names      : SJER_dsmCrop 
+## values     : 338.96, 510.35  (min, max)</code></pre>
 <pre class="r"><code>DTM_SJER</code></pre>
-<pre><code>## class       : RasterLayer 
-## dimensions  : 2178, 2005, 4366890  (nrow, ncol, ncell)
-## resolution  : 1, 1  (x, y)
-## extent      : 255693, 257698, 4109511, 4111689  (xmin, xmax, ymin, ymax)
-## coord. ref. : +proj=utm +zone=11 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0 
-## data source : /home/z3289452/Documents/GIT_REPOS/19_resbazSydGIS/data/NEON-DS-Airborne-Remote-Sensing/SJER/DTM/SJER_dtmCrop.tif 
-## names       : SJER_dtmCrop 
-## values      : 338.93, 496.31  (min, max)</code></pre>
+<pre><code>## class      : RasterLayer 
+## dimensions : 2178, 2005, 4366890  (nrow, ncol, ncell)
+## resolution : 1, 1  (x, y)
+## extent     : 255693, 257698, 4109511, 4111689  (xmin, xmax, ymin, ymax)
+## crs        : +proj=utm +zone=11 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0 
+## source     : /Users/darya/Dropbox (Sydney Uni)/Training/19_09_11_ResBaz/19_01_11_ResBazGIS/data/NEON-DS-Airborne-Remote-Sensing/SJER/DTM/SJER_dtmCrop.tif 
+## names      : SJER_dtmCrop 
+## values     : 338.93, 496.31  (min, max)</code></pre>
 <p><em>Res, CRS and units are the same</em></p>
 <ol start="2" style="list-style-type: decimal">
 <li>Create a CHM from the two raster layers and check to make sure the data are what you expect.</li>
@@ -476,14 +587,14 @@ DSM_SJER</code></pre>
 <pre class="r"><code>CHM_SJER &lt;- DSM_SJER - DTM_SJER
 
 CHM_SJER</code></pre>
-<pre><code>## class       : RasterLayer 
-## dimensions  : 2178, 2005, 4366890  (nrow, ncol, ncell)
-## resolution  : 1, 1  (x, y)
-## extent      : 255693, 257698, 4109511, 4111689  (xmin, xmax, ymin, ymax)
-## coord. ref. : +proj=utm +zone=11 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0 
-## data source : /srv/scratch/z3289452/tmp/Rtmp/Rtmp9JY4Yp/raster/r_tmp_2019-09-10_120701_8128_94090.grd 
-## names       : layer 
-## values      : -1.399994, 32.63  (min, max)</code></pre>
+<pre><code>## class      : RasterLayer 
+## dimensions : 2178, 2005, 4366890  (nrow, ncol, ncell)
+## resolution : 1, 1  (x, y)
+## extent     : 255693, 257698, 4109511, 4111689  (xmin, xmax, ymin, ymax)
+## crs        : +proj=utm +zone=11 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0 
+## source     : memory
+## names      : layer 
+## values     : -1.399994, 32.63  (min, max)</code></pre>
 <p>Using the overlay function:</p>
 <pre class="r"><code>CHM_ov_SJER &lt;- overlay(DSM_SJER,
                        DTM_SJER,
@@ -492,14 +603,14 @@ CHM_SJER</code></pre>
                        })
 
 CHM_ov_SJER</code></pre>
-<pre><code>## class       : RasterLayer 
-## dimensions  : 2178, 2005, 4366890  (nrow, ncol, ncell)
-## resolution  : 1, 1  (x, y)
-## extent      : 255693, 257698, 4109511, 4111689  (xmin, xmax, ymin, ymax)
-## coord. ref. : +proj=utm +zone=11 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0 
-## data source : in memory
-## names       : layer 
-## values      : -1.399994, 32.63  (min, max)</code></pre>
+<pre><code>## class      : RasterLayer 
+## dimensions : 2178, 2005, 4366890  (nrow, ncol, ncell)
+## resolution : 1, 1  (x, y)
+## extent     : 255693, 257698, 4109511, 4111689  (xmin, xmax, ymin, ymax)
+## crs        : +proj=utm +zone=11 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0 
+## source     : memory
+## names      : layer 
+## values     : -1.399994, 32.63  (min, max)</code></pre>
 <p><em>In both cases the min is negative!</em></p>
 <ol start="3" style="list-style-type: decimal">
 <li>Plot the CHM from SJER.</li>

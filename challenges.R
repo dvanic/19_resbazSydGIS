@@ -31,8 +31,8 @@
 #
 #
 #
-# Challenge 5
-# Create DTM & DSM for SJER (SKIP IF LOW ON TIME)
+# Challenge 5 (SKIP IF LOW ON TIME!!!)
+# Create DTM & DSM for SJER 
 # 1. Use the files in the NEON_RemoteSensing/SJER/ directory to create a Digital Terrain 
 # 2. Model map and Digital Surface Model map of the San Joaquin Experimental Range field site.
 # 3. Make sure to:
@@ -42,28 +42,30 @@
 # - include a title for each map,
 # - experiment with various alpha values and color palettes to represent the data.
 # 
-
-
+#
+#
+#
+#
 # 03 Reproject Rasters in R ---------
-## Challenge 1
+## Challenge 6
 ## View the CRS for each of these datasets. What projection does each use?
 #
-## Challenge 2
+## Challenge 7
 ## Why do you think the two extents differ?
 #
-## Challenge 3
+## Challenge 8
 ## Create a map of the San Joaquin Experimental Range field site using the SJER_DSMhill_WGS84.tif and SJER_dsmCrop.tif files. 
 ## Reproject the data as necessary to make things line up!
 ## If you completed the San Joaquin plotting challenge in the Plot Raster Data in R episode, 
 ## how does the map you just created compare to that map?
 
 # 04 Raster Calculations --------------
-## Challenge 1
+## Challenge 9
 ## Use GDALinfo() fucntion to view information about the DTM and DSM data files. Do the two rasters have the same or different
 ## CRSs and resolutions? DO they both have defined minimum and maximum values?
 #
 #
-## Challenge 2
+## Challenge 10
 ## It’s often a good idea to explore the range of values in a raster dataset just like we might explore a dataset that we collected in the field.
 ## 1. What is the min and maximum value for the Harvard Forest Canopy Height Model (CHM_HARV) that we just created?
 ## 2. What are two ways you can check this range of data for CHM_HARV?
@@ -72,7 +74,7 @@
 #
 #
 #
-## Challenge 3
+## Challenge 11
 ## Data are often more interesting and powerful when we compare them across various locations. 
 ## Let’s compare some data collected over Harvard Forest to data collected in Southern California. 
 ## The NEON San Joaquin Experimental Range (SJER) field site located in Southern California has a very different ecosystem 
@@ -89,7 +91,7 @@
 
 # 07 vector shapefile attributes -------------
 
-# Challenge 1 (RENUMBER LATER!)
+# Challenge 12 
 # Using the steps above, import the HARV_roads and HARVtower_UTM18N layers into R. Call the HARV_roads object lines_HARV and the HARVtower_UTM18N point_HARV.
 # Answer the following questions:
 #
@@ -98,20 +100,20 @@
 #3.Do the files contain points, lines, or polygons?
 #4. How many spatial objects are in each file?
 
-# Challenge 2 (RENUMBER LATER!)
+# Challenge 13
 # Explore the attributes associated with the point_HARV and aoi_boundary_HARV spatial objects.
 # 1. How many attributes does each have?
 # 2. Who owns the site in the point_HARV data object?
 # 3. Which of the following is NOT an attribute of the point_HARV data object?
 # 4. A) Latitude B) County C) Country
 
-# Challenge 3 (RENUMBER LATER!)
+# Challenge 14
 # 1. Create a map of the state boundaries in the United States using the data located in your downloaded data folder: 
 # NEON-DS-Site-Layout-Files/US-Boundary-Layers\US-State-Boundaries-Census-2014. 
 # 2. Apply a fill color to each state using its region value. 
 # 3. Add a legend.
 
-# Challenge 4 (RENUMBER LATER!)
+# Challenge 15
 # Create a map of the North Eastern United States as follows:
 # 1. Import and plot Boundary-US-State-NEast.shp. Adjust line width as necessary.
 # 2. Layer the Fisher Tower (in the NEON Harvard Forest site) point location point_HARV onto the plot.

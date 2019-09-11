@@ -10,9 +10,9 @@ knitr::opts_chunk$set(echo = TRUE)
 1. Names of instructors (write on board)
 2. Introduce instructors and helper:
     - Darya: bioinformatics, analyst etc
-    - Alireza
     - Steefan
     - Alex
+    - Matthias
 4. Exits/toilets/first aid/timing of breaks
 5. Operations: sign in, name tags, stickies. Code of conduct
 5. Operations: slides + code + exercises
@@ -26,15 +26,24 @@ knitr::opts_chunk$set(echo = TRUE)
 ***
 ### Links to our pages
 
-CHALLENGES FILE: LALALA
+CHALLENGES FILE: 
 
 - reminder: link to challenges file in first page of student notes!!!
+
+### If using RStudio cloud
+
+[HERE](https://rstudio.cloud/project/504397)
+
+DOWNSAMPLE RASTERS or the thing falls over
+```
+DSM_HARV_2 <-  aggregate(DSM_HARV, fact=5)
+```
 
 #### Session 1 - Darya
 
 This will be a presentation. Make a link to it later
 
-#### Session 2 - Alireza
+#### Session 2 - Steefan
 
 
 [01rasterstructure](01rasterstructure.html)
