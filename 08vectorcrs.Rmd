@@ -4,10 +4,15 @@
 - Objectives: Plot vector objects with different CRSs in the same plot.
 
 ```{r loadData, echo=FALSE}
+library(raster)
 library(sf)
 library(tidyverse)
 theme_set(theme_minimal())
 point_HARV <- st_read("data/NEON-DS-Site-Layout-Files/HARV/HARVtower_UTM18N.shp")
+DTM_HARV <- raster("data/NEON-DS-Airborne-Remote-Sensing/HARV/DTM/HARV_dtmCrop.tif")
+DSM_HARV <- raster("data/NEON-DS-Airborne-Remote-Sensing/HARV/DSM/HARV_dsmCrop.tif")
+CHM_HARV <- DSM_HARV - DTM_HARV
+aoi_boundary_HARV <- st_read("data/NEON-DS-Site-Layout-Files/HARV/HarClip_UTMZ18.shp")
 
 ```
 
@@ -102,5 +107,20 @@ NE.States.Boundary.US %>%
     coord_sf()
 
 
+```
+
+## Crop a Raster to Vector Extent
+## Extract values from raster using spatial data
+
+```{r}
+CHM_HARV_Cropped <- crop(x = CHM_HARV, y = as(aoi_boundary_HARV, "Spatial"))
+```
+
+```{r}
+plot(CHM_HARV)
+plot(aoi_boundary_HARV, add=TRUE,lwd=2,col=NA)
+plot(CHM_HARV_Cropped)
+
+mean_tree_height_tower <- raster::extract(x = CHM_HARV, y = as(point_HARV, "Spatial"), buffer = 20, fun = mean)
 ```
 

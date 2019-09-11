@@ -419,128 +419,6 @@ DSM_HARV_df %&gt;%
   coord_quickmap()</code></pre>
 <p><img src="02rasterplot_files/figure-html/Ch4-1.png" width="672" /></p>
 </div>
-<div id="layering-rasters" class="section level2">
-<h2>Layering Rasters</h2>
-<p>We can layer a raster on top of a hillshade raster for the same area, and use a transparency factor to create a 3-dimensional shaded effect. A <strong>hillshade</strong> is a raster that maps the shadows and texture that you would see from above when viewing terrain. We will add a custom color, making the plot grey.</p>
-<p>First we need to read the DSM hillshade data;</p>
-<pre class="r"><code>DSM_hill_HARV &lt;-
-  raster(&quot;data/NEON-DS-Airborne-Remote-Sensing/HARV/DSM/HARV_DSMhill.tif&quot;)
-
-DSM_hill_HARV</code></pre>
-<pre><code>## class      : RasterLayer 
-## dimensions : 1367, 1697, 2319799  (nrow, ncol, ncell)
-## resolution : 1, 1  (x, y)
-## extent     : 731453, 733150, 4712471, 4713838  (xmin, xmax, ymin, ymax)
-## crs        : +proj=utm +zone=18 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0 
-## source     : /Users/darya/Dropbox (Sydney Uni)/Training/19_09_11_ResBaz/19_01_11_ResBazGIS/data/NEON-DS-Airborne-Remote-Sensing/HARV/DSM/HARV_DSMhill.tif 
-## names      : HARV_DSMhill 
-## values     : -0.7136298, 0.9999997  (min, max)</code></pre>
-<p>Then convert it to a data frame:</p>
-<pre class="r"><code>DSM_hill_HARV_df &lt;- as.data.frame(DSM_hill_HARV, xy = TRUE) 
-
-str(DSM_hill_HARV_df)</code></pre>
-<pre><code>## &#39;data.frame&#39;:    2319799 obs. of  3 variables:
-##  $ x           : num  731454 731454 731456 731456 731458 ...
-##  $ y           : num  4713838 4713838 4713838 4713838 4713838 ...
-##  $ HARV_DSMhill: num  NA NA NA NA NA NA NA NA NA NA ...</code></pre>
-<p>Then plot it using ggplot:</p>
-<pre class="r"><code>DSM_hill_HARV_df %&gt;%
-  ggplot() +
-  geom_raster(aes(x = x, y = y, alpha = HARV_DSMhill)) + 
-  scale_alpha(range =  c(0.15, 0.65), guide = &quot;none&quot;) + 
-  coord_quickmap() +
-  # turn off legend
-  theme(legend.position = &quot;none&quot;)</code></pre>
-<p><img src="02rasterplot_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
-<p>We can layer another raster on top of our hillshade by adding another call to the geom_raster() function.</p>
-<pre class="r"><code>DSM_HARV_df %&gt;%
-  ggplot() +
-  geom_raster(aes(x = x, y = y, fill = HARV_dsmCrop)) + 
-  geom_raster(data = DSM_hill_HARV_df, 
-              aes(x = x, y = y, 
-                  alpha = HARV_DSMhill)) +  
-  scale_fill_viridis_c(name = &quot;Elevation&quot;) +  
-  scale_alpha(range = c(0.15, 0.65), guide = &quot;none&quot;) +  
-  ggtitle(&quot;Elevation with hillshade&quot;) +
-  coord_quickmap()</code></pre>
-<p><img src="02rasterplot_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
-<pre class="r"><code># Challenge 5
-# Create DTM &amp; DSM for SJER (SKIP IF LOW ON TIME)
-# 1. Use the files in the NEON_RemoteSensing/SJER/ directory to create a Digital Terrain 
-# 2. Model map and Digital Surface Model map of the San Joaquin Experimental Range field site.
-# 3. Make sure to:
-# 
-# - include hillshade in the maps,
-# - label axes on the DSM map and exclude them from the DTM map,
-# - include a title for each map,
-# - experiment with various alpha values and color palettes to represent the data.
-#
-#
-# CREATE DSM MAPS
-
-# import DSM data
-DSM_SJER &lt;- raster(&quot;data/NEON-DS-Airborne-Remote-Sensing/SJER/DSM/SJER_dsmCrop.tif&quot;)
-# convert to a df for plotting
-DSM_SJER_df &lt;- as.data.frame(DSM_SJER, xy = TRUE)
-
-# import DSM hillshade
-DSM_hill_SJER &lt;- raster(&quot;data/NEON-DS-Airborne-Remote-Sensing/SJER/DSM/SJER_dsmHill.tif&quot;)
-# convert to a df for plotting
-DSM_hill_SJER_df &lt;- as.data.frame(DSM_hill_SJER, xy = TRUE)
-
-# Build Plot
-ggplot() +
-    geom_raster(data = DSM_SJER_df , 
-                aes(x = x, y = y, 
-                     fill = SJER_dsmCrop,
-                     alpha = 0.8)
-                ) + 
-    geom_raster(data = DSM_hill_SJER_df, 
-                aes(x = x, y = y, 
-                  alpha = SJER_dsmHill)
-                ) +
-    scale_fill_viridis_c() +
-    guides(fill = guide_colorbar()) +
-    scale_alpha(range = c(0.4, 0.7), guide = &quot;none&quot;) +
-    # remove grey background and grid lines
-    theme_bw() + 
-    theme(panel.grid.major = element_blank(), 
-          panel.grid.minor = element_blank()) +
-    xlab(&quot;UTM Westing Coordinate (m)&quot;) +
-    ylab(&quot;UTM Northing Coordinate (m)&quot;) +
-    ggtitle(&quot;DSM with Hillshade&quot;) +
-    coord_quickmap()</code></pre>
-<p><img src="02rasterplot_files/figure-html/Ch5-1.png" width="672" /></p>
-<pre class="r"><code># CREATE DTM MAP
-# import DTM
-DTM_SJER &lt;- raster(&quot;data/NEON-DS-Airborne-Remote-Sensing/SJER/DTM/SJER_dtmCrop.tif&quot;)
-DTM_SJER_df &lt;- as.data.frame(DTM_SJER, xy = TRUE)
-
-# DTM Hillshade
-DTM_hill_SJER &lt;- raster(&quot;data/NEON-DS-Airborne-Remote-Sensing/SJER/DTM/SJER_dtmHill.tif&quot;)
-DTM_hill_SJER_df &lt;- as.data.frame(DTM_hill_SJER, xy = TRUE)
-
-ggplot() +
-    geom_raster(data = DTM_SJER_df ,
-                aes(x = x, y = y,
-                     fill = SJER_dtmCrop,
-                     alpha = 2.0)
-                ) +
-    geom_raster(data = DTM_hill_SJER_df,
-                aes(x = x, y = y,
-                  alpha = SJER_dtmHill)
-                ) +
-    scale_fill_viridis_c() +
-    guides(fill = guide_colorbar()) +
-    scale_alpha(range = c(0.4, 0.7), guide = &quot;none&quot;) +
-    theme_bw() +
-    theme(panel.grid.major = element_blank(), 
-          panel.grid.minor = element_blank()) +
-    theme(axis.title.x = element_blank(),
-          axis.title.y = element_blank()) +
-    ggtitle(&quot;DTM with Hillshade&quot;) +
-    coord_quickmap()</code></pre>
-<p><img src="02rasterplot_files/figure-html/Ch5-2.png" width="672" /></p>
 <div id="summary" class="section level3">
 <h3>Summary</h3>
 <ol style="list-style-type: decimal">
@@ -548,7 +426,6 @@ ggplot() +
 <li>Use built-in terrain.colors() or set your preferred color scheme manually.</li>
 <li>Layer rasters on top of one another by using the alpha aesthetic.</li>
 </ol>
-</div>
 </div>
 
 

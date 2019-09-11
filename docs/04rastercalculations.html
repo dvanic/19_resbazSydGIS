@@ -335,6 +335,12 @@ $(document).ready(function () {
 <li><strong>Canopy Height Model:</strong> This is the height of the vegetation corrected for the elevation of the terrain. I.e. <strong>DSM</strong> - <strong>DTM</strong>.</li>
 </ul>
 <p>Load rgdal and raster libraries if not already loaded</p>
+<pre class="r"><code>library(ggplot2)</code></pre>
+<pre><code>## Registered S3 methods overwritten by &#39;ggplot2&#39;:
+##   method         from 
+##   [.quosures     rlang
+##   c.quosures     rlang
+##   print.quosures rlang</code></pre>
 <pre class="r"><code>## Challenge 9
 # Use GDALinfo() fucntion to view information about the DTM and DSM data files. Do the two rasters have the same or different CRSs and resolutions? DO they both have defined minimum and maximum values?
   
@@ -401,32 +407,6 @@ DTM_HARV &lt;- raster(&quot;data/NEON-DS-Airborne-Remote-Sensing/HARV/DTM/HARV_d
 # Convert into dfs
 DSM_HARV_df &lt;- as.data.frame(DSM_HARV, xy = TRUE)
 DTM_HARV_df &lt;- as.data.frame(DTM_HARV, xy = TRUE)</code></pre>
-<p>Do quick plots to view the raster/dfs</p>
-<p>Load ggplot if haven’t done so.</p>
-<pre class="r"><code>library(ggplot2)</code></pre>
-<pre><code>## Registered S3 methods overwritten by &#39;ggplot2&#39;:
-##   method         from 
-##   [.quosures     rlang
-##   c.quosures     rlang
-##   print.quosures rlang</code></pre>
-<pre class="r"><code># DSM_HARV
-
-# raster plot
-plot(DSM_HARV)</code></pre>
-<p><img src="04rastercalculations_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
-<pre class="r"><code># ggplot
-ggplot() +
-  geom_raster(data = DSM_HARV_df, aes(x = x, y = y, fill = HARV_dsmCrop)) +
-  scale_fill_gradientn(name = &quot;Elevation&quot;, colours = terrain.colors(10)) +
-  coord_quickmap()</code></pre>
-<p><img src="04rastercalculations_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
-<pre class="r"><code># DTM_HARV
-# ggplot
-ggplot() +
-  geom_raster(data = DTM_HARV_df, aes(x = x, y = y, fill = HARV_dtmCrop)) +
-  scale_fill_gradientn(name = &quot;Elevation&quot;, colours = terrain.colors(10)) +
-  coord_quickmap()</code></pre>
-<p><img src="04rastercalculations_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 </div>
 <div id="raster-calculations-1" class="section level1">
 <h1>Raster Calculations</h1>
@@ -436,7 +416,7 @@ ggplot() +
 </ul>
 <div id="raster-math" class="section level2">
 <h2>Raster Math</h2>
-<p>We will subtract DTM from DSM</p>
+<p>We will subtract DTM from DSM to get CHM</p>
 <pre class="r"><code>CHM_HARV &lt;- DSM_HARV - DTM_HARV
 
 # Convert to df
@@ -446,76 +426,19 @@ str(CHM_HARV_df)</code></pre>
 ##  $ x    : num  731454 731454 731456 731456 731458 ...
 ##  $ y    : num  4713838 4713838 4713838 4713838 4713838 ...
 ##  $ layer: num  19.4 18.7 17.1 17.2 19.7 ...</code></pre>
-<p>Plot using ggplot</p>
-<pre class="r"><code>ggplot() +
-  geom_raster(data = CHM_HARV_df, aes(x = x, y = y, fill = layer)) + 
-  scale_fill_gradientn(name = &quot;Canopy Height&quot;, colours = terrain.colors(10)) +
-  coord_quickmap()</code></pre>
-<p><img src="04rastercalculations_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p>Plot using base plot to make things quick</p>
+<pre class="r"><code>plot(CHM_HARV)</code></pre>
+<p><img src="04rastercalculations_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
 <p>Distribution of canopy heights</p>
 <pre class="r"><code>ggplot() +
   geom_histogram(data = CHM_HARV_df, aes(layer))</code></pre>
 <pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
 <pre><code>## Warning: Removed 1 rows containing non-finite values (stat_bin).</code></pre>
-<p><img src="04rastercalculations_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p><img src="04rastercalculations_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 <p>Does the above distribution make sense?</p>
-<div id="challenge-2" class="section level3">
-<h3>Challenge 2</h3>
-<p>It’s often a good idea to explore the range of values in a raster dataset just like we might explore a dataset that we collected in the field.</p>
-<ol style="list-style-type: decimal">
-<li>What is the min and maximum value for the Harvard Forest Canopy Height Model (CHM_HARV) that we just created?</li>
-<li>What are two ways you can check this range of data for CHM_HARV?</li>
-<li>Plot a histogram with 6 bins instead of the default and change the color of the histogram.</li>
-<li>Plot the CHM_HARV raster using breaks that make sense for the data. Include an appropriate color palette for the data, plot title and no axes ticks / labels.</li>
-</ol>
-<pre class="r"><code>CHM_HARV</code></pre>
-<pre><code>## class      : RasterLayer 
-## dimensions : 1367, 1697, 2319799  (nrow, ncol, ncell)
-## resolution : 1, 1  (x, y)
-## extent     : 731453, 733150, 4712471, 4713838  (xmin, xmax, ymin, ymax)
-## crs        : +proj=utm +zone=18 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0 
-## source     : memory
-## names      : layer 
-## values     : 0, 38.16998  (min, max)</code></pre>
-<ol style="list-style-type: decimal">
-<li>min: 0 max: 38.17</li>
-<li>print raster object, use min() and max() functions (don’t forget na.rm argument), create histogram</li>
-<li></li>
-</ol>
-<pre class="r"><code>ggplot() + 
-  geom_histogram(data = CHM_HARV_df, aes(layer),
-                 bins = 6, colour = &quot;black&quot;, 
-                 fill = &quot;darkgreen&quot;)</code></pre>
-<pre><code>## Warning: Removed 1 rows containing non-finite values (stat_bin).</code></pre>
-<p><img src="04rastercalculations_files/figure-html/unnamed-chunk-11-1.png" width="672" /> 4. Load dplyr library</p>
-<pre class="r"><code>library(dplyr)</code></pre>
-<pre><code>## 
-## Attaching package: &#39;dplyr&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:raster&#39;:
-## 
-##     intersect, select, union</code></pre>
-<pre><code>## The following objects are masked from &#39;package:stats&#39;:
-## 
-##     filter, lag</code></pre>
-<pre><code>## The following objects are masked from &#39;package:base&#39;:
-## 
-##     intersect, setdiff, setequal, union</code></pre>
-<pre class="r"><code>custom_bins &lt;- c(0, 10, 20, 30, 40)
-CHM_HARV_df &lt;- CHM_HARV_df %&gt;% mutate(canopy_discrete = cut(layer, breaks = custom_bins))
-
-# plot
-ggplot() +
-  geom_raster(data = CHM_HARV_df, aes(x = x, y = y, fill = canopy_discrete)) + 
-  scale_fill_manual(name = &quot;Canopy Height (m)&quot;, values = terrain.colors(length(custom_bins)-1)) +
-  ggtitle(&quot;Harvard Forrest Canopy Height&quot;) + 
-  theme(axis.text = element_blank(), axis.ticks = element_blank(), axis.title = element_blank()) + 
-  coord_quickmap()</code></pre>
-<pre><code>## Warning: Removed 51136 rows containing missing values (geom_raster).</code></pre>
-<p><img src="04rastercalculations_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
-</div>
 </div>
 <div id="raster-calculations-overlay-function" class="section level2">
-<h2>Raster calculations Overlay function</h2>
+<h2>Raster calculations Overlay function —</h2>
 <p>We use the overlay function when:</p>
 <ol style="list-style-type: decimal">
 <li>calculation are complex.</li>
@@ -529,18 +452,8 @@ ggplot() +
                          return(r1 - r2)
                        })</code></pre>
 <p>Convert to df for plotting</p>
-<pre class="r"><code>CHM_ov_HARV_df &lt;- as.data.frame(CHM_ov_HARV, xy = TRUE)
-str(CHM_ov_HARV_df)</code></pre>
-<pre><code>## &#39;data.frame&#39;:    2319799 obs. of  3 variables:
-##  $ x    : num  731454 731454 731456 731456 731458 ...
-##  $ y    : num  4713838 4713838 4713838 4713838 4713838 ...
-##  $ layer: num  19.4 18.7 17.1 17.2 19.7 ...</code></pre>
-<p>Now the plot</p>
-<pre class="r"><code>ggplot() +
-  geom_raster(data = CHM_ov_HARV_df, aes(x = x, y = y, fill = layer)) + 
-  scale_fill_gradientn(name = &quot;Canopy Height&quot;, colours = terrain.colors(10)) +
-  coord_quickmap()</code></pre>
-<p><img src="04rastercalculations_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<pre class="r"><code>plot(CHM_ov_HARV)</code></pre>
+<p><img src="04rastercalculations_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
 <p>Compare the two plots from the two different raster calculation methods. They should be identical.</p>
 </div>
 <div id="export-rasters-as-geotiffs" class="section level2">
@@ -552,8 +465,8 @@ str(CHM_ov_HARV_df)</code></pre>
             format = &quot;GTiff&quot;,
             overwrite = TRUE,
             NAflag = -9999)</code></pre>
-<div id="challenge-3" class="section level3">
-<h3>Challenge 3</h3>
+<div id="challenge-3---skip-if-no-time" class="section level3">
+<h3>Challenge 3 - SKIP IF NO TIME</h3>
 <p>Data are often more interesting and powerful when we compare them across various locations. Let’s compare some data collected over Harvard Forest to data collected in Southern California. The NEON San Joaquin Experimental Range (SJER) field site located in Southern California has a very different ecosystem and climate than the NEON Harvard Forest Field Site in Massachusetts.</p>
 <p>Import the SJER DSM and DTM raster files and create a Canopy Height Model. Then compare the two sites. Be sure to name your R objects and outputs carefully, as follows: objectType_SJER (e.g. DSM_SJER). This will help you keep track of data from different sites!</p>
 <ol style="list-style-type: decimal">
@@ -622,7 +535,7 @@ ggplot() +
   geom_raster(data = CHM_ov_SJER_df, aes(x = x, y = y, fill = layer)) + 
   scale_fill_gradientn(name = &quot;Canopy Height&quot;, colours = terrain.colors(10)) +
   coord_quickmap()</code></pre>
-<p><img src="04rastercalculations_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
+<p><img src="04rastercalculations_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
 <ol start="4" style="list-style-type: decimal">
 <li>Export the SJER CHM as a GeoTIFF.</li>
 </ol>
@@ -642,12 +555,12 @@ ggplot() +
   geom_histogram(data = CHM_HARV_df, aes(layer))</code></pre>
 <pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
 <pre><code>## Warning: Removed 1 rows containing non-finite values (stat_bin).</code></pre>
-<p><img src="04rastercalculations_files/figure-html/unnamed-chunk-23-1.png" width="672" /></p>
+<p><img src="04rastercalculations_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
 <pre class="r"><code># San Joaquin Env res.
 ggplot() +
   geom_histogram(data = CHM_ov_SJER_df, aes(layer))</code></pre>
 <pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
-<p><img src="04rastercalculations_files/figure-html/unnamed-chunk-23-2.png" width="672" /> <em>SJER is a lot more barren and had much shorter vegetation.</em></p>
+<p><img src="04rastercalculations_files/figure-html/unnamed-chunk-15-2.png" width="672" /> <em>SJER is a lot more barren and had much shorter vegetation.</em></p>
 </div>
 </div>
 </div>

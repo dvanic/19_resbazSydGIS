@@ -320,35 +320,22 @@ $(document).ready(function () {
 </div>
 
 
-<div id="open-and-plot-shapefiles-in-r" class="section level3">
-<h3>Open and Plot Shapefiles in R</h3>
-<ol style="list-style-type: decimal">
-<li>Questions:</li>
-</ol>
-<ul>
-<li>How can I distinguish between and visualize point, line and polygon vector data?</li>
-</ul>
-<ol start="2" style="list-style-type: decimal">
-<li>Objectives</li>
-</ol>
-<ul>
-<li>Know the difference between point, line, and polygon vector elements.</li>
-<li>Load point, line, and polygon shapefiles into R.</li>
-<li>Access the attributes of a spatial object in R.</li>
-</ul>
-<p>The data we’ll be using come from the NEON Harvard Forest field site, which we have been working with in previous episodes.</p>
-</div>
-<div id="import-shapefiles" class="section level2">
-<h2>Import shapefiles</h2>
-<ul>
-<li><p>We will use the <code>sf</code> package to work with vector data in R. This stands for “Spatial features”.</p></li>
-<li><p><code>rgdal</code> automatically loads when <code>sf</code> is loaded. I’ll mention here that there is another package called <code>sp</code>, which was the “old” one used to work with vector files in R. We will use <code>sf</code> in this course, as it is newer and more robust (as in, doesn’t change the data type when doing things linke merges and joins) - but you sometimes will need to use <code>sp</code> with other R packages, most notably raster, - and you’ll see it on stackoverflow.</p></li>
-</ul>
-<p>The shapefiles that we will import are: - A polygon shapefile representing our field site boundary, which we’ll call our Area Of Interest or AOI - A line shapefile representing roads - A point shapefile representing the location of the Fisher flux tower - which we will call “tower” from now on.</p>
-<pre class="r"><code>library(sf)</code></pre>
+<div id="explore-and-plot-by-shapefile-attributes" class="section level2">
+<h2>Explore and Plot by Shapefile Attributes</h2>
 <pre><code>## Linking to GEOS 3.6.1, GDAL 2.1.3, PROJ 4.9.3</code></pre>
-<pre class="r"><code># To import shapefiles we use the sf function st_read()
-aoi_boundary_HARV &lt;- st_read(&quot;data/NEON-DS-Site-Layout-Files/HARV/HarClip_UTMZ18.shp&quot;)</code></pre>
+<pre><code>## Registered S3 methods overwritten by &#39;ggplot2&#39;:
+##   method         from 
+##   [.quosures     rlang
+##   c.quosures     rlang
+##   print.quosures rlang</code></pre>
+<pre><code>## ── Attaching packages ──────────────────────────────────── tidyverse 1.2.1 ──</code></pre>
+<pre><code>## ✔ ggplot2 3.1.1     ✔ purrr   0.3.2
+## ✔ tibble  2.1.3     ✔ dplyr   0.8.1
+## ✔ tidyr   0.8.3     ✔ stringr 1.4.0
+## ✔ readr   1.3.1     ✔ forcats 0.4.0</code></pre>
+<pre><code>## ── Conflicts ─────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()</code></pre>
 <pre><code>## Reading layer `HarClip_UTMZ18&#39; from data source `/Users/darya/Dropbox (Sydney Uni)/Training/19_09_11_ResBaz/19_01_11_ResBazGIS/data/NEON-DS-Site-Layout-Files/HARV/HarClip_UTMZ18.shp&#39; using driver `ESRI Shapefile&#39;
 ## Simple feature collection with 1 feature and 1 field
 ## geometry type:  POLYGON
@@ -356,29 +343,122 @@ aoi_boundary_HARV &lt;- st_read(&quot;data/NEON-DS-Site-Layout-Files/HARV/HarCli
 ## bbox:           xmin: 732128 ymin: 4713209 xmax: 732251.1 ymax: 4713359
 ## epsg (SRID):    32618
 ## proj4string:    +proj=utm +zone=18 +datum=WGS84 +units=m +no_defs</code></pre>
-<p>Let’s look at the metadata of our shapefile…</p>
-<p>…</p>
-<ul>
-<li><p>Note that the spatial extent for a shapefile represents the combined extent for all spatial objects in the shapefile.</p></li>
-<li><p>There are commands to view this information from the R object as well</p></li>
-</ul>
-<pre class="r"><code>st_geometry_type(aoi_boundary_HARV)</code></pre>
-<pre><code>## [1] POLYGON
-## 18 Levels: GEOMETRY POINT LINESTRING POLYGON ... TRIANGLE</code></pre>
-<pre class="r"><code># you can see all possible geometry types using
-levels(st_geometry_type(aoi_boundary_HARV))</code></pre>
-<pre><code>##  [1] &quot;GEOMETRY&quot;           &quot;POINT&quot;              &quot;LINESTRING&quot;        
-##  [4] &quot;POLYGON&quot;            &quot;MULTIPOINT&quot;         &quot;MULTILINESTRING&quot;   
-##  [7] &quot;MULTIPOLYGON&quot;       &quot;GEOMETRYCOLLECTION&quot; &quot;CIRCULARSTRING&quot;    
-## [10] &quot;COMPOUNDCURVE&quot;      &quot;CURVEPOLYGON&quot;       &quot;MULTICURVE&quot;        
-## [13] &quot;MULTISURFACE&quot;       &quot;CURVE&quot;              &quot;SURFACE&quot;           
-## [16] &quot;POLYHEDRALSURFACE&quot;  &quot;TIN&quot;                &quot;TRIANGLE&quot;</code></pre>
-<pre class="r"><code># note some are more useful than others
+<pre><code>## Reading layer `HARV_roads&#39; from data source `/Users/darya/Dropbox (Sydney Uni)/Training/19_09_11_ResBaz/19_01_11_ResBazGIS/data/NEON-DS-Site-Layout-Files/HARV/HARV_roads.shp&#39; using driver `ESRI Shapefile&#39;
+## Simple feature collection with 13 features and 15 fields
+## geometry type:  MULTILINESTRING
+## dimension:      XY
+## bbox:           xmin: 730741.2 ymin: 4711942 xmax: 733295.5 ymax: 4714260
+## epsg (SRID):    32618
+## proj4string:    +proj=utm +zone=18 +datum=WGS84 +units=m +no_defs</code></pre>
+<pre><code>## Reading layer `HARVtower_UTM18N&#39; from data source `/Users/darya/Dropbox (Sydney Uni)/Training/19_09_11_ResBaz/19_01_11_ResBazGIS/data/NEON-DS-Site-Layout-Files/HARV/HARVtower_UTM18N.shp&#39; using driver `ESRI Shapefile&#39;
+## Simple feature collection with 1 feature and 14 fields
+## geometry type:  POINT
+## dimension:      XY
+## bbox:           xmin: 732183.2 ymin: 4713265 xmax: 732183.2 ymax: 4713265
+## epsg (SRID):    32618
+## proj4string:    +proj=utm +zone=18 +datum=WGS84 +units=m +no_defs</code></pre>
+<p>We can use the “usual” R ncol and dim functions from R to look at our objects:</p>
+<pre class="r"><code>dim(lines_HARV)</code></pre>
+<pre><code>## [1] 13 16</code></pre>
+<pre class="r"><code>lines_HARV %&gt;% head()</code></pre>
+<pre><code>## Simple feature collection with 6 features and 15 fields
+## geometry type:  MULTILINESTRING
+## dimension:      XY
+## bbox:           xmin: 730741.2 ymin: 4712685 xmax: 732232.3 ymax: 4713726
+## epsg (SRID):    32618
+## proj4string:    +proj=utm +zone=18 +datum=WGS84 +units=m +no_defs
+##   OBJECTID_1 OBJECTID       TYPE             NOTES MISCNOTES RULEID
+## 1         14       48 woods road Locust Opening Rd      &lt;NA&gt;      5
+## 2         40       91   footpath              &lt;NA&gt;      &lt;NA&gt;      6
+## 3         41      106   footpath              &lt;NA&gt;      &lt;NA&gt;      6
+## 4        211      279 stone wall              &lt;NA&gt;      &lt;NA&gt;      1
+## 5        212      280 stone wall              &lt;NA&gt;      &lt;NA&gt;      1
+## 6        213      281 stone wall              &lt;NA&gt;      &lt;NA&gt;      1
+##            MAPLABEL SHAPE_LENG             LABEL BIKEHORSE RESVEHICLE
+## 1 Locust Opening Rd 1297.35706 Locust Opening Rd         Y         R1
+## 2              &lt;NA&gt;  146.29984              &lt;NA&gt;         Y         R1
+## 3              &lt;NA&gt;  676.71804              &lt;NA&gt;         Y         R2
+## 4              &lt;NA&gt;  231.78957              &lt;NA&gt;      &lt;NA&gt;       &lt;NA&gt;
+## 5              &lt;NA&gt;   45.50864              &lt;NA&gt;      &lt;NA&gt;       &lt;NA&gt;
+## 6              &lt;NA&gt;  198.39043              &lt;NA&gt;      &lt;NA&gt;       &lt;NA&gt;
+##   RECMAP Shape_Le_1                            ResVehic_1
+## 1      Y 1297.10617    R1 - All Research Vehicles Allowed
+## 2      Y  146.29983    R1 - All Research Vehicles Allowed
+## 3      Y  676.71807 R2 - 4WD/High Clearance Vehicles Only
+## 4   &lt;NA&gt;  231.78962                                  &lt;NA&gt;
+## 5   &lt;NA&gt;   45.50859                                  &lt;NA&gt;
+## 6   &lt;NA&gt;  198.39041                                  &lt;NA&gt;
+##                    BicyclesHo                       geometry
+## 1 Bicycles and Horses Allowed MULTILINESTRING ((730819.2 ...
+## 2 Bicycles and Horses Allowed MULTILINESTRING ((732040.2 ...
+## 3 Bicycles and Horses Allowed MULTILINESTRING ((732057 47...
+## 4                        &lt;NA&gt; MULTILINESTRING ((731903.6 ...
+## 5                        &lt;NA&gt; MULTILINESTRING ((732039.1 ...
+## 6                        &lt;NA&gt; MULTILINESTRING ((732056.2 ...</code></pre>
+<pre class="r"><code>ncol(point_HARV)</code></pre>
+<pre><code>## [1] 15</code></pre>
+<pre class="r"><code># Explore the attributes associated with the point_HARV and aoi_boundary_HARV spatial objects.
 # 
-st_crs(aoi_boundary_HARV)</code></pre>
-<pre><code>## Coordinate Reference System:
-##   EPSG: 32618 
-##   proj4string: &quot;+proj=utm +zone=18 +datum=WGS84 +units=m +no_defs&quot;</code></pre>
+#     How many attributes does each have?
+#     Who owns the site in the point_HARV data object?
+# 
+#     Which of the following is NOT an attribute of the point_HARV data object?
+# 
+# A) Latitude 
+# B) County 
+# C) Country
+# </code></pre>
+<p>Because this is R, we can use standard R operations to access specific columns of the sf dataframe:</p>
+<pre class="r"><code>lines_HARV$TYPE</code></pre>
+<pre><code>##  [1] woods road footpath   footpath   stone wall stone wall stone wall
+##  [7] stone wall stone wall stone wall boardwalk  woods road woods road
+## [13] woods road
+## Levels: boardwalk footpath stone wall woods road</code></pre>
+<pre class="r"><code>levels(lines_HARV$TYPE)</code></pre>
+<pre><code>## [1] &quot;boardwalk&quot;  &quot;footpath&quot;   &quot;stone wall&quot; &quot;woods road&quot;</code></pre>
+<p>Furthermore, we can use dplyr commands to work with our object just like a dataframe - because that’s what it is:</p>
+<pre class="r"><code>class(lines_HARV)</code></pre>
+<pre><code>## [1] &quot;sf&quot;         &quot;data.frame&quot;</code></pre>
+<p>Let’s plot only the footpaths:</p>
+<pre class="r"><code>lines_HARV %&gt;%   ggplot() + geom_sf() </code></pre>
+<p><img src="07vectorshapefileattributes_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<pre class="r"><code>lines_HARV %&gt;% 
+  filter(TYPE == &quot;footpath&quot;) %&gt;% 
+  ggplot() + geom_sf() </code></pre>
+<p><img src="07vectorshapefileattributes_files/figure-html/unnamed-chunk-3-2.png" width="672" /></p>
+<p>Now let’s plot all of the different road types, colouring them in by type:</p>
+<pre class="r"><code># First, how many road types are there?
+levels(lines_HARV$TYPE)</code></pre>
+<pre><code>## [1] &quot;boardwalk&quot;  &quot;footpath&quot;   &quot;stone wall&quot; &quot;woods road&quot;</code></pre>
+<pre class="r"><code># let&#39;s build up the ggplot
+lines_HARV %&gt;%
+  ggplot() + 
+  geom_sf(aes(col = TYPE)) +
+  scale_color_manual(values = c(&quot;red&quot;, &quot;green&quot;, &quot;blue&quot;, &quot;magenta&quot;)) +
+  ggtitle(&quot;NEON Harvard Forest Field Site&quot;, subtitle = &quot;Roads Where Bikes and Horses Are Allowed&quot;) + 
+  coord_sf()</code></pre>
+<p><img src="07vectorshapefileattributes_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<pre class="r"><code># Create a map of the state boundaries in the United States using the data located in your downloaded data folder: # NEON-DS-Site-Layout-Files/US-Boundary-Layers\US-State-Boundaries-Census-2014. 
+# Apply a fill color to each state using its region value. Add a legend.
+
+state_boundary_US &lt;- 
+st_read(&quot;data/NEON-DS-Site-Layout-Files/US-Boundary-Layers/US-State-Boundaries-Census-2014.shp&quot;)</code></pre>
+<pre><code>## Reading layer `US-State-Boundaries-Census-2014&#39; from data source `/Users/darya/Dropbox (Sydney Uni)/Training/19_09_11_ResBaz/19_01_11_ResBazGIS/data/NEON-DS-Site-Layout-Files/US-Boundary-Layers/US-State-Boundaries-Census-2014.shp&#39; using driver `ESRI Shapefile&#39;
+## Simple feature collection with 58 features and 10 fields
+## geometry type:  MULTIPOLYGON
+## dimension:      XYZ
+## bbox:           xmin: -124.7258 ymin: 24.49813 xmax: -66.9499 ymax: 49.38436
+## epsg (SRID):    4326
+## proj4string:    +proj=longlat +datum=WGS84 +no_defs</code></pre>
+<pre class="r"><code>levels(state_boundary_US$region)</code></pre>
+<pre><code>## [1] &quot;Midwest&quot;   &quot;Northeast&quot; &quot;Southeast&quot; &quot;Southwest&quot; &quot;West&quot;</code></pre>
+<pre class="r"><code>colors &lt;- c(&quot;purple&quot;, &quot;springgreen&quot;, &quot;yellow&quot;, &quot;brown&quot;, &quot;navy&quot;)
+ggplot() +
+  geom_sf(data = state_boundary_US, aes(color = region), size = 1) +
+  scale_color_manual(values = colors) +
+  ggtitle(&quot;Contiguous U.S. State Boundaries&quot;) + 
+  coord_sf()</code></pre>
+<p><img src="07vectorshapefileattributes_files/figure-html/Ch3-1.png" width="672" /></p>
 </div>
 
 

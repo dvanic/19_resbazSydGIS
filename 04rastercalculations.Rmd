@@ -16,7 +16,7 @@ Using these two we will try and calculate the
 
 Load rgdal and raster libraries if not already loaded
 ```{r}
-
+library(ggplot2)
 ## Challenge 9
 # Use GDALinfo() fucntion to view information about the DTM and DSM data files. Do the two rasters have the same or different CRSs and resolutions? DO they both have defined minimum and maximum values?
   
@@ -41,34 +41,6 @@ DSM_HARV_df <- as.data.frame(DSM_HARV, xy = TRUE)
 DTM_HARV_df <- as.data.frame(DTM_HARV, xy = TRUE)
 ```
 
-Do quick plots to view the raster/dfs
-
-Load ggplot if haven't done so.
-```{r}
-library(ggplot2)
-```
-
-```{r}
-# DSM_HARV
-
-# raster plot
-plot(DSM_HARV)
-# ggplot
-ggplot() +
-  geom_raster(data = DSM_HARV_df, aes(x = x, y = y, fill = HARV_dsmCrop)) +
-  scale_fill_gradientn(name = "Elevation", colours = terrain.colors(10)) +
-  coord_quickmap()
-```
-
-```{r}
-# DTM_HARV
-# ggplot
-ggplot() +
-  geom_raster(data = DTM_HARV_df, aes(x = x, y = y, fill = HARV_dtmCrop)) +
-  scale_fill_gradientn(name = "Elevation", colours = terrain.colors(10)) +
-  coord_quickmap()
-```
-
 # Raster Calculations
 
 - Most of the times we can just use raster math. You can add, sub, divide, mulitple, log, exp etc. rasters directly.
@@ -76,7 +48,8 @@ ggplot() +
 
 ## Raster Math
 
-We will subtract DTM from DSM
+We will subtract DTM from DSM to get CHM
+
 ```{r}
 CHM_HARV <- DSM_HARV - DTM_HARV
 
@@ -85,12 +58,9 @@ CHM_HARV_df <- as.data.frame(CHM_HARV, xy = TRUE)
 str(CHM_HARV_df)
 ```
 
-Plot using ggplot
+Plot using base plot to make things quick
 ```{r}
-ggplot() +
-  geom_raster(data = CHM_HARV_df, aes(x = x, y = y, fill = layer)) + 
-  scale_fill_gradientn(name = "Canopy Height", colours = terrain.colors(10)) +
-  coord_quickmap()
+plot(CHM_HARV)
 ```
 
 Distribution of canopy heights
@@ -101,46 +71,9 @@ ggplot() +
 
 Does the above distribution make sense?
 
-### Challenge 2
-It’s often a good idea to explore the range of values in a raster dataset just like we might explore a dataset that we collected in the field.
 
-1. What is the min and maximum value for the Harvard Forest Canopy Height Model (CHM_HARV) that we just created?
-2. What are two ways you can check this range of data for CHM_HARV?
-3. Plot a histogram with 6 bins instead of the default and change the color of the histogram.
-4. Plot the CHM_HARV raster using breaks that make sense for the data. Include an appropriate color palette for the data, plot title and no axes ticks / labels.
 
-```{r}
-CHM_HARV
-```
-1. min: 0 max: 38.17
-2. print raster object, use min() and max() functions (don't forget na.rm argument), create histogram
-3. 
-```{r}
-ggplot() + 
-  geom_histogram(data = CHM_HARV_df, aes(layer),
-                 bins = 6, colour = "black", 
-                 fill = "darkgreen")
-```
-4.
-Load dplyr library
-```{r}
-library(dplyr)
-```
-
-```{r}
-custom_bins <- c(0, 10, 20, 30, 40)
-CHM_HARV_df <- CHM_HARV_df %>% mutate(canopy_discrete = cut(layer, breaks = custom_bins))
-
-# plot
-ggplot() +
-  geom_raster(data = CHM_HARV_df, aes(x = x, y = y, fill = canopy_discrete)) + 
-  scale_fill_manual(name = "Canopy Height (m)", values = terrain.colors(length(custom_bins)-1)) +
-  ggtitle("Harvard Forrest Canopy Height") + 
-  theme(axis.text = element_blank(), axis.ticks = element_blank(), axis.title = element_blank()) + 
-  coord_quickmap()
-```
-
-## Raster calculations Overlay function
+## Raster calculations Overlay function ---
 
 We use the overlay function when:
 
@@ -160,16 +93,7 @@ CHM_ov_HARV <- overlay(DSM_HARV,
 
 Convert to df for plotting
 ```{r}
-CHM_ov_HARV_df <- as.data.frame(CHM_ov_HARV, xy = TRUE)
-str(CHM_ov_HARV_df)
-```
-
-Now the plot
-```{r}
-ggplot() +
-  geom_raster(data = CHM_ov_HARV_df, aes(x = x, y = y, fill = layer)) + 
-  scale_fill_gradientn(name = "Canopy Height", colours = terrain.colors(10)) +
-  coord_quickmap()
+plot(CHM_ov_HARV)
 ```
 
 Compare the two plots from the two different raster calculation methods. They should be identical.
@@ -187,7 +111,7 @@ writeRaster(CHM_ov_HARV,
             NAflag = -9999)
 ```
 
-### Challenge 3
+### Challenge 3 - SKIP IF NO TIME
 Data are often more interesting and powerful when we compare them across various locations. Let’s compare some data collected over Harvard Forest to data collected in Southern California. The NEON San Joaquin Experimental Range (SJER) field site located in Southern California has a very different ecosystem and climate than the NEON Harvard Forest Field Site in Massachusetts.
 
 Import the SJER DSM and DTM raster files and create a Canopy Height Model. Then compare the two sites. Be sure to name your R objects and outputs carefully, as follows: objectType_SJER (e.g. DSM_SJER). This will help you keep track of data from different sites!

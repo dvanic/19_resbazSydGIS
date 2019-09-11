@@ -324,7 +324,6 @@ $(document).ready(function () {
 <h3>Reproject Raster</h3>
 <p>LIFE: How do I work with raster data sets that are in different projections?</p>
 <p>Give examples…</p>
-<p>In the Plot Raster Data in R episode, we learned how to layer a raster file on top of a hillshade for a nice looking basemap. In that episode, all of our data were in the same CRS. What happens when things don’t line up?</p>
 </div>
 <div id="initial-setup-and-exploration" class="section level2">
 <h2>Initial Setup and exploration</h2>
@@ -372,7 +371,8 @@ str(DTM_HARV_df)</code></pre>
   geom_raster(aes(x = x, y = y, fill = HARV_dtmCrop)) +
   scale_fill_gradientn(name = &quot;Elevation&quot;, colours = terrain.colors(10)) +
   coord_quickmap()</code></pre>
-<p><img src="03rasterreproject_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p><img src="03rasterreproject_files/figure-html/unnamed-chunk-3-1.png" width="672" /> ## Layering Rasters</p>
+<p>We can layer a raster on top of a hillshade raster for the same area, and use a transparency factor to create a 3-dimensional shaded effect. A <strong>hillshade</strong> is a raster that maps the shadows and texture that you would see from above when viewing terrain. We will add a custom color, making the plot grey.</p>
 <p>Now plot hillshade</p>
 <pre class="r"><code>DTM_hill_HARV_df %&gt;%
   ggplot() + 
@@ -459,8 +459,8 @@ crs(DTM_hill_UTMZ18_HARV)</code></pre>
   scale_alpha(range = c(0.25, 0.65), guide = &quot;none&quot;) +
   coord_quickmap() </code></pre>
 <p><img src="03rasterreproject_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
-<div id="exercise-3" class="section level3">
-<h3>Exercise 3</h3>
+<div id="exercise-3---skip-this" class="section level3">
+<h3>Exercise 3 - SKIP THIS</h3>
 <p>Create a map of the San Joaquin Experimental Range field site using the SJER_DSMhill_WGS84.tif and SJER_dsmCrop.tif files. Reproject the data as necessary to make things line up!</p>
 <pre class="r"><code># import
 DSM_SJER &lt;- raster(&quot;data/NEON-DS-Airborne-Remote-Sensing/SJER/DSM/SJER_dsmCrop.tif&quot;)

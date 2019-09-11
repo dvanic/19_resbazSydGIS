@@ -5,9 +5,6 @@ LIFE: How do I work with raster data sets that are in different projections?
 Give examples...
 
 
-In the Plot Raster Data in R episode, we learned how to layer a raster file on top of a hillshade for a nice looking basemap. In that episode, all of our data were in the same CRS. What happens when things don’t line up?
-
-
 ## Initial Setup and exploration
 
 **Task:** Import two geoTiffs, investigate ggplot behaviour when plotting them on top of each other. Explain behaviour by comparing projections of the two geoTiffs.
@@ -56,6 +53,9 @@ DTM_HARV_df %>%
   scale_fill_gradientn(name = "Elevation", colours = terrain.colors(10)) +
   coord_quickmap()
 ```
+## Layering Rasters
+
+We can layer a raster on top of a hillshade raster for the same area, and use a transparency factor to create a 3-dimensional shaded effect. A **hillshade** is a raster that maps the shadows and texture that you would see from above when viewing terrain. We will add a custom color, making the plot grey.
 
 Now plot hillshade
 ```{r}
@@ -155,7 +155,7 @@ ggplot() +
   coord_quickmap() 
 ```
 
-### Exercise 3
+### Exercise 3 - SKIP THIS
 Create a map of the San Joaquin Experimental Range field site using the SJER_DSMhill_WGS84.tif and SJER_dsmCrop.tif files. Reproject the data as necessary to make things line up!
 ```{r ch5, cache=TRUE}
 # import
