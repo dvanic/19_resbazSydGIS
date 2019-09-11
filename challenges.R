@@ -78,7 +78,7 @@
 ## Data are often more interesting and powerful when we compare them across various locations. 
 ## Let’s compare some data collected over Harvard Forest to data collected in Southern California. 
 ## The NEON San Joaquin Experimental Range (SJER) field site located in Southern California has a very different ecosystem 
-## and climate than the NEON Harvard Forest Field Site in Massachusetts.
+##limate than the NEON Harvard Forest Field Site in Massachusetts.
 ## Import the SJER DSM and DTM raster files and create a Canopy Height Model. 
 ## Then compare the two sites. Be sure to name your R objects and outputs carefully, as follows: 
 ## objectType_SJER (e.g. DSM_SJER). This will help you keep track of data from different sites!
@@ -115,7 +115,6 @@
 
 # Challenge 15
 # Create a map of the North Eastern United States as follows:
-# 1. Import and plot Boundary-US-State-NEast.shp. Adjust line width as necessary.
-# 2. Layer the Fisher Tower (in the NEON Harvard Forest site) point location point_HARV onto the plot.
+# 1. Import and plot Boundarhe Fisher Tower (in the NEON Harvard Forest site) point location point_HARV onto the plot.
 # 3. Add a title.
-# 4. Add a legend that shows both the state boundary (as a line) and the Tower location point.
+# 4. Add a legend that shows both the state boundary (as a line) and the Tower location
